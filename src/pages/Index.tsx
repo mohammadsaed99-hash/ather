@@ -11,6 +11,7 @@ import {
   CircleUserRound,
   Compass,
   Feather,
+  Flag,
   Globe2,
   Heart,
   Home,
@@ -87,6 +88,8 @@ type Copy = {
   sponsored: string;
   noAds: string;
   privacyNote: string;
+  reportVulgar: string;
+  reported: string;
 };
 
 const copy: Record<Locale, Copy> = {
@@ -142,6 +145,8 @@ const copy: Record<Locale, Copy> = {
     sponsored: "إعلان مختار",
     noAds: "لا توجد إعلانات في هذه الفئة الآن.",
     privacyNote: "يُستخدم الموقع على جهازك لترتيب النتائج ولا نحتفظ بإحداثياتك.",
+    reportVulgar: "محتوى مبتذل / تعري",
+    reported: "تم إرسال البلاغ",
   },
   en: {
     nav: { home: "Home", explore: "Explore", circles: "Circles", saved: "Saved", ads: "Ads" },
@@ -195,6 +200,8 @@ const copy: Record<Locale, Copy> = {
     sponsored: "Curated ad",
     noAds: "No ads in this category right now.",
     privacyNote: "Your location stays on this device and is only used to sort results.",
+    reportVulgar: "Nudity / vulgar content",
+    reported: "Report sent",
   },
   fr: {
     nav: { home: "Accueil", explore: "Découvrir", circles: "Cercles", saved: "Enregistrés", ads: "Annonces" },
@@ -248,6 +255,8 @@ const copy: Record<Locale, Copy> = {
     sponsored: "Annonce choisie",
     noAds: "Aucune annonce dans cette catégorie pour le moment.",
     privacyNote: "Votre lieu reste sur cet appareil et sert uniquement à trier les résultats.",
+    reportVulgar: "Nudité / contenu vulgaire",
+    reported: "Signalement envoyé",
   },
   zh: {
     nav: { home: "首页", explore: "探索", circles: "圈子", saved: "收藏", ads: "广告" },
@@ -301,6 +310,8 @@ const copy: Record<Locale, Copy> = {
     sponsored: "精选广告",
     noAds: "此分类暂时没有广告。",
     privacyNote: "位置留在此设备上，仅用于排列结果。",
+    reportVulgar: "裸露 / 低俗内容",
+    reported: "举报已发送",
   },
   es: {
     nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados", ads: "Anuncios" },
@@ -354,6 +365,8 @@ const copy: Record<Locale, Copy> = {
     sponsored: "Anuncio seleccionado",
     noAds: "No hay anuncios en esta categoría ahora.",
     privacyNote: "Tu ubicación permanece en este dispositivo y solo ordena los resultados.",
+    reportVulgar: "Desnudez / contenido vulgar",
+    reported: "Denuncia enviada",
   },
   hi: {
     nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए", ads: "विज्ञापन" },
@@ -407,6 +420,8 @@ const copy: Record<Locale, Copy> = {
     sponsored: "चुना हुआ विज्ञापन",
     noAds: "इस श्रेणी में अभी कोई विज्ञापन नहीं है।",
     privacyNote: "आपका स्थान इसी डिवाइस पर रहता है और केवल परिणाम क्रम के लिए उपयोग होता है।",
+    reportVulgar: "अश्लील / नग्न सामग्री",
+    reported: "रिपोर्ट भेजी गई",
   },
 };
 
@@ -630,6 +645,7 @@ const Index = () => {
   const [posted, setPosted] = useState(false);
   const [liked, setLiked] = useState<number[]>([]);
   const [saved, setSaved] = useState<number[]>([]);
+  const [reportedPosts, setReportedPosts] = useState<number[]>([]);
   const [followedTopics, setFollowedTopics] = useState<string[]>(["تصوير", "أدب", "علوم"]);
   const t = copy[locale];
   const isRtl = locale === "ar";
@@ -653,6 +669,10 @@ const Index = () => {
 
   const toggleSaved = (id: number) => {
     setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  };
+
+  const reportPost = (id: number) => {
+    setReportedPosts((current) => current.includes(id) ? current : [...current, id]);
   };
 
   const toggleTopic = (topic: string) => {
@@ -787,6 +807,7 @@ const Index = () => {
                 {visiblePosts.map((post) => {
                   const isLiked = liked.includes(post.id);
                   const isSaved = saved.includes(post.id);
+                  const isReported = reportedPosts.includes(post.id);
                   return <article key={post.id} className="post-card rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)] sm:p-6">
                     <div className="flex items-start gap-3">
                       <Avatar className={`h-10 w-10 shrink-0 ${post.tone}`}><AvatarFallback className={post.tone}>{post.initials}</AvatarFallback></Avatar>
@@ -794,10 +815,11 @@ const Index = () => {
                       <button aria-label="More" className="rounded-lg p-1 text-[#a4ada5] hover:bg-[#f0f2ed] hover:text-[#607260]"><MoreHorizontal className="h-4 w-4" /></button>
                     </div>
                     <p className="mt-5 text-[15px] leading-8 text-[#4d5b52]">{post.body[locale]}</p>
-                    <div className="mt-5 flex items-center gap-1 border-t border-[#edf0ea] pt-3 text-xs text-[#9aa59d]">
+                    <div className="mt-5 flex flex-wrap items-center gap-1 border-t border-[#edf0ea] pt-3 text-xs text-[#9aa59d]">
                       <button onClick={() => toggleLike(post.id)} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#f6eae5] ${isLiked ? "text-[#bd755e]" : "hover:text-[#b86e57]"}`}><Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />{isLiked ? t.liked : t.like}{isLiked && <span>{post.likes + 1}</span>}</button>
                       <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</button>
                       <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><ArrowUpLeft className="h-4 w-4" />{t.share}</button>
+                      <button onClick={() => reportPost(post.id)} disabled={isReported} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition ${isReported ? "text-[#bd755e]" : "hover:bg-[#f6eae5] hover:text-[#b86e57]"}`}><Flag className={`h-4 w-4 ${isReported ? "fill-current" : ""}`} />{isReported ? t.reported : t.reportVulgar}</button>
                       <button onClick={() => toggleSaved(post.id)} className={`ms-auto rounded-lg p-2 transition hover:bg-[#edf3e9] ${isSaved ? "text-[#6b7f5a]" : "text-[#9aa59d] hover:text-[#66805c]"}`} aria-label={isSaved ? t.saved : t.save}><Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} /></button>
                     </div>
                   </article>;
