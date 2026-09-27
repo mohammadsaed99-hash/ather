@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   ChevronDown,
   CircleUserRound,
+  Eye,
+  EyeOff,
   Compass,
   Feather,
   Flag,
@@ -26,6 +28,7 @@ import {
   Search,
   Send,
   Settings2,
+  ShieldAlert,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
@@ -90,6 +93,9 @@ type Copy = {
   privacyNote: string;
   reportVulgar: string;
   reported: string;
+  sensitiveNotice: string;
+  showSensitive: string;
+  hideSensitive: string;
 };
 
 const copy: Record<Locale, Copy> = {
@@ -147,6 +153,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "يُستخدم الموقع على جهازك لترتيب النتائج ولا نحتفظ بإحداثياتك.",
     reportVulgar: "محتوى مبتذل / تعري",
     reported: "تم إرسال البلاغ",
+    sensitiveNotice: "صورة تحتوي على مشاهد استعراضية",
+    showSensitive: "عرض الصورة بوعي",
+    hideSensitive: "إخفاء الصورة",
   },
   en: {
     nav: { home: "Home", explore: "Explore", circles: "Circles", saved: "Saved", ads: "Ads" },
@@ -202,6 +211,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "Your location stays on this device and is only used to sort results.",
     reportVulgar: "Nudity / vulgar content",
     reported: "Report sent",
+    sensitiveNotice: "Image contains suggestive scenes",
+    showSensitive: "Show mindfully",
+    hideSensitive: "Hide image",
   },
   fr: {
     nav: { home: "Accueil", explore: "Découvrir", circles: "Cercles", saved: "Enregistrés", ads: "Annonces" },
@@ -257,6 +269,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "Votre lieu reste sur cet appareil et sert uniquement à trier les résultats.",
     reportVulgar: "Nudité / contenu vulgaire",
     reported: "Signalement envoyé",
+    sensitiveNotice: "Cette image contient des scènes suggestives",
+    showSensitive: "Afficher consciemment",
+    hideSensitive: "Masquer l'image",
   },
   zh: {
     nav: { home: "首页", explore: "探索", circles: "圈子", saved: "收藏", ads: "广告" },
@@ -312,6 +327,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "位置留在此设备上，仅用于排列结果。",
     reportVulgar: "裸露 / 低俗内容",
     reported: "举报已发送",
+    sensitiveNotice: "图片包含具有暗示性的场景",
+    showSensitive: "谨慎查看",
+    hideSensitive: "隐藏图片",
   },
   es: {
     nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados", ads: "Anuncios" },
@@ -367,6 +385,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "Tu ubicación permanece en este dispositivo y solo ordena los resultados.",
     reportVulgar: "Desnudez / contenido vulgar",
     reported: "Denuncia enviada",
+    sensitiveNotice: "La imagen contiene escenas sugerentes",
+    showSensitive: "Ver con intención",
+    hideSensitive: "Ocultar imagen",
   },
   hi: {
     nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए", ads: "विज्ञापन" },
@@ -422,6 +443,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "आपका स्थान इसी डिवाइस पर रहता है और केवल परिणाम क्रम के लिए उपयोग होता है।",
     reportVulgar: "अश्लील / नग्न सामग्री",
     reported: "रिपोर्ट भेजी गई",
+    sensitiveNotice: "इस तस्वीर में उत्तेजक दृश्य हैं",
+    showSensitive: "सचेत होकर देखें",
+    hideSensitive: "तस्वीर छिपाएँ",
   },
 };
 
@@ -439,6 +463,7 @@ const topics = ["تصوير", "أدب", "علوم", "تقنية", "حياة ها
 const posts = [
   {
     id: 1,
+    sensitive: false,
     author: "سارة المنصور",
     handle: "sara.m",
     initials: "س",
@@ -446,6 +471,7 @@ const posts = [
     circle: "العائلة والأصدقاء",
     time: "8",
     topic: "تصوير",
+    imageTone: "bg-[#d8e1d4]",
     body: {
       ar: "في الصباحات التي لا نستعجلها، نرى أشياء صغيرة كانت تختبئ خلف الضجيج. صورة من نافذتي هذا الصباح.",
       en: "On mornings we don't rush, we notice the small things hiding behind the noise. A view from my window today.",
@@ -459,6 +485,7 @@ const posts = [
   },
   {
     id: 2,
+    sensitive: false,
     author: "نادر يونس",
     handle: "nader.reads",
     initials: "ن",
@@ -466,6 +493,7 @@ const posts = [
     circle: "المعارف والعمل",
     time: "24",
     topic: "أدب",
+    imageTone: "bg-[#e9dfd2]",
     body: {
       ar: "الكتاب الجيد لا يعطيك إجابات أسرع، بل يمنحك أسئلة أعمق تعيش معها قليلاً.",
       en: "A good book doesn't give faster answers. It gives deeper questions to live with for a while.",
@@ -479,6 +507,7 @@ const posts = [
   },
   {
     id: 3,
+    sensitive: false,
     author: "عمر حداد",
     handle: "omar.fieldnotes",
     initials: "ع",
@@ -486,6 +515,7 @@ const posts = [
     circle: "عام",
     time: "41",
     topic: "علوم",
+    imageTone: "bg-[#d9e2e5]",
     body: {
       ar: "تذكير لطيف: ليس كل ما يمكن قياسه يستحق أن نقيسه. بعض الأشياء تُعرف بالإحساس فقط.",
       en: "A gentle reminder: not everything that can be measured is worth measuring. Some things are known only by feeling.",
@@ -496,6 +526,28 @@ const posts = [
     },
     likes: 36,
     replies: 8,
+  },
+  {
+    id: 4,
+    sensitive: true,
+    author: "حساب عام",
+    handle: "open.notes",
+    initials: "ح",
+    tone: "bg-[#ead9d4] text-[#95675d]",
+    circle: "عام",
+    time: "52",
+    topic: "تصوير",
+    imageTone: "bg-[#cbb7aa]",
+    body: {
+      ar: "لحظة من معرض فني مفتوح.",
+      en: "A moment from an open art exhibition.",
+      fr: "Un moment d'une exposition artistique ouverte.",
+      zh: "来自开放艺术展的一刻。",
+      es: "Un momento de una exposición de arte abierta.",
+      hi: "एक खुले कला प्रदर्शन की एक झलक।",
+    },
+    likes: 9,
+    replies: 1,
   },
 ];
 
@@ -646,6 +698,7 @@ const Index = () => {
   const [liked, setLiked] = useState<number[]>([]);
   const [saved, setSaved] = useState<number[]>([]);
   const [reportedPosts, setReportedPosts] = useState<number[]>([]);
+  const [revealedPosts, setRevealedPosts] = useState<number[]>([]);
   const [followedTopics, setFollowedTopics] = useState<string[]>(["تصوير", "أدب", "علوم"]);
   const t = copy[locale];
   const isRtl = locale === "ar";
@@ -673,6 +726,10 @@ const Index = () => {
 
   const reportPost = (id: number) => {
     setReportedPosts((current) => current.includes(id) ? current : [...current, id]);
+  };
+
+  const toggleSensitivePost = (id: number) => {
+    setRevealedPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
   const toggleTopic = (topic: string) => {
@@ -808,6 +865,7 @@ const Index = () => {
                   const isLiked = liked.includes(post.id);
                   const isSaved = saved.includes(post.id);
                   const isReported = reportedPosts.includes(post.id);
+                  const isRevealed = revealedPosts.includes(post.id);
                   return <article key={post.id} className="post-card rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)] sm:p-6">
                     <div className="flex items-start gap-3">
                       <Avatar className={`h-10 w-10 shrink-0 ${post.tone}`}><AvatarFallback className={post.tone}>{post.initials}</AvatarFallback></Avatar>
@@ -815,6 +873,20 @@ const Index = () => {
                       <button aria-label="More" className="rounded-lg p-1 text-[#a4ada5] hover:bg-[#f0f2ed] hover:text-[#607260]"><MoreHorizontal className="h-4 w-4" /></button>
                     </div>
                     <p className="mt-5 text-[15px] leading-8 text-[#4d5b52]">{post.body[locale]}</p>
+                    {post.sensitive && <div className="relative mt-4 overflow-hidden rounded-[22px] border border-[#ded8d0] bg-[#e9e2d9]">
+                      <div className={`relative h-56 overflow-hidden transition duration-500 ${isRevealed ? "" : "blur-[18px] scale-[1.04]"} ${post.imageTone}`} aria-hidden={!isRevealed}>
+                        <div className="absolute inset-x-10 top-8 h-32 rounded-[42%] bg-[#9d7f75] opacity-80" />
+                        <div className="absolute bottom-[-30px] start-8 h-36 w-36 rounded-full bg-[#b89583] opacity-80" />
+                        <div className="absolute bottom-[-25px] end-10 h-44 w-28 rotate-12 rounded-[48%] bg-[#876d68] opacity-75" />
+                        <div className="absolute start-1/2 top-7 h-20 w-20 -translate-x-1/2 rounded-full bg-[#d6b69f] opacity-90" />
+                      </div>
+                      {!isRevealed && <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#354039]/45 px-5 text-center text-white">
+                        <ShieldAlert className="mb-3 h-7 w-7" />
+                        <p className="text-sm font-bold">{t.sensitiveNotice}</p>
+                        <button onClick={() => toggleSensitivePost(post.id)} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-bold text-[#52654f] shadow-sm transition hover:bg-[#f1f5ed]"><Eye className="h-4 w-4" />{t.showSensitive}</button>
+                      </div>}
+                      {isRevealed && <button onClick={() => toggleSensitivePost(post.id)} className="absolute end-3 top-3 inline-flex items-center gap-2 rounded-xl bg-[#fbfaf7]/90 px-3 py-2 text-xs font-bold text-[#59695c] shadow-sm backdrop-blur-sm"><EyeOff className="h-4 w-4" />{t.hideSensitive}</button>}
+                    </div>}
                     <div className="mt-5 flex flex-wrap items-center gap-1 border-t border-[#edf0ea] pt-3 text-xs text-[#9aa59d]">
                       <button onClick={() => toggleLike(post.id)} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#f6eae5] ${isLiked ? "text-[#bd755e]" : "hover:text-[#b86e57]"}`}><Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />{isLiked ? t.liked : t.like}{isLiked && <span>{post.likes + 1}</span>}</button>
                       <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</button>
