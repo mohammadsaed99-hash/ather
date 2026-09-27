@@ -93,6 +93,9 @@ type Copy = {
   privacyNote: string;
   reportVulgar: string;
   reported: string;
+  lowValueReport: string;
+  valuesReport: string;
+  signalSent: string;
   sensitiveNotice: string;
   showSensitive: string;
   hideSensitive: string;
@@ -153,6 +156,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "يُستخدم الموقع على جهازك لترتيب النتائج ولا نحتفظ بإحداثياتك.",
     reportVulgar: "محتوى مبتذل / تعري",
     reported: "تم إرسال البلاغ",
+    lowValueReport: "لا يقدم إضافة / محتوى تافه",
+    valuesReport: "مخل بالآداب / مخالف للقيم",
+    signalSent: "تم تسجيل تقييمك",
     sensitiveNotice: "صورة تحتوي على مشاهد استعراضية",
     showSensitive: "عرض الصورة بوعي",
     hideSensitive: "إخفاء الصورة",
@@ -211,6 +217,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "Your location stays on this device and is only used to sort results.",
     reportVulgar: "Nudity / vulgar content",
     reported: "Report sent",
+    lowValueReport: "Adds no value / low-value content",
+    valuesReport: "Unethical / against values",
+    signalSent: "Your signal was recorded",
     sensitiveNotice: "Image contains suggestive scenes",
     showSensitive: "Show mindfully",
     hideSensitive: "Hide image",
@@ -269,6 +278,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "Votre lieu reste sur cet appareil et sert uniquement à trier les résultats.",
     reportVulgar: "Nudité / contenu vulgaire",
     reported: "Signalement envoyé",
+    lowValueReport: "N'apporte rien / contenu pauvre",
+    valuesReport: "Contraire aux bonnes mœurs / aux valeurs",
+    signalSent: "Votre signalement est enregistré",
     sensitiveNotice: "Cette image contient des scènes suggestives",
     showSensitive: "Afficher consciemment",
     hideSensitive: "Masquer l'image",
@@ -327,6 +339,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "位置留在此设备上，仅用于排列结果。",
     reportVulgar: "裸露 / 低俗内容",
     reported: "举报已发送",
+    lowValueReport: "没有价值 / 低质量内容",
+    valuesReport: "不当内容 / 违反价值观",
+    signalSent: "已记录你的评价",
     sensitiveNotice: "图片包含具有暗示性的场景",
     showSensitive: "谨慎查看",
     hideSensitive: "隐藏图片",
@@ -385,6 +400,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "Tu ubicación permanece en este dispositivo y solo ordena los resultados.",
     reportVulgar: "Desnudez / contenido vulgar",
     reported: "Denuncia enviada",
+    lowValueReport: "No aporta / contenido superficial",
+    valuesReport: "Inadecuado / contrario a los valores",
+    signalSent: "Tu valoración se ha registrado",
     sensitiveNotice: "La imagen contiene escenas sugerentes",
     showSensitive: "Ver con intención",
     hideSensitive: "Ocultar imagen",
@@ -443,6 +461,9 @@ const copy: Record<Locale, Copy> = {
     privacyNote: "आपका स्थान इसी डिवाइस पर रहता है और केवल परिणाम क्रम के लिए उपयोग होता है।",
     reportVulgar: "अश्लील / नग्न सामग्री",
     reported: "रिपोर्ट भेजी गई",
+    lowValueReport: "कोई मूल्य नहीं / सतही सामग्री",
+    valuesReport: "अनुचित / मूल्यों के विरुद्ध",
+    signalSent: "आपका संकेत दर्ज हो गया",
     sensitiveNotice: "इस तस्वीर में उत्तेजक दृश्य हैं",
     showSensitive: "सचेत होकर देखें",
     hideSensitive: "तस्वीर छिपाएँ",
@@ -698,6 +719,8 @@ const Index = () => {
   const [liked, setLiked] = useState<number[]>([]);
   const [saved, setSaved] = useState<number[]>([]);
   const [reportedPosts, setReportedPosts] = useState<number[]>([]);
+  const [lowValuePosts, setLowValuePosts] = useState<number[]>([]);
+  const [valuesPosts, setValuesPosts] = useState<number[]>([]);
   const [revealedPosts, setRevealedPosts] = useState<number[]>([]);
   const [followedTopics, setFollowedTopics] = useState<string[]>(["تصوير", "أدب", "علوم"]);
   const t = copy[locale];
@@ -726,6 +749,14 @@ const Index = () => {
 
   const reportPost = (id: number) => {
     setReportedPosts((current) => current.includes(id) ? current : [...current, id]);
+  };
+
+  const toggleLowValueSignal = (id: number) => {
+    setLowValuePosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  };
+
+  const toggleValuesSignal = (id: number) => {
+    setValuesPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
   const toggleSensitivePost = (id: number) => {
@@ -865,6 +896,8 @@ const Index = () => {
                   const isLiked = liked.includes(post.id);
                   const isSaved = saved.includes(post.id);
                   const isReported = reportedPosts.includes(post.id);
+                  const hasLowValueSignal = lowValuePosts.includes(post.id);
+                  const hasValuesSignal = valuesPosts.includes(post.id);
                   const isRevealed = revealedPosts.includes(post.id);
                   return <article key={post.id} className="post-card rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)] sm:p-6">
                     <div className="flex items-start gap-3">
@@ -892,6 +925,8 @@ const Index = () => {
                       <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</button>
                       <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><ArrowUpLeft className="h-4 w-4" />{t.share}</button>
                       <button onClick={() => reportPost(post.id)} disabled={isReported} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition ${isReported ? "text-[#bd755e]" : "hover:bg-[#f6eae5] hover:text-[#b86e57]"}`}><Flag className={`h-4 w-4 ${isReported ? "fill-current" : ""}`} />{isReported ? t.reported : t.reportVulgar}</button>
+                      <button onClick={() => toggleLowValueSignal(post.id)} aria-pressed={hasLowValueSignal} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-start transition ${hasLowValueSignal ? "bg-[#f4e8d9] text-[#9a724d]" : "hover:bg-[#f5efe7] hover:text-[#9a724d]"}`}><Sparkles className={`h-4 w-4 ${hasLowValueSignal ? "fill-current" : ""}`} />{hasLowValueSignal ? t.signalSent : t.lowValueReport}</button>
+                      <button onClick={() => toggleValuesSignal(post.id)} aria-pressed={hasValuesSignal} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-start transition ${hasValuesSignal ? "bg-[#f6e2df] text-[#a25f57]" : "hover:bg-[#f8ecea] hover:text-[#a25f57]"}`}><ShieldAlert className={`h-4 w-4 ${hasValuesSignal ? "fill-current" : ""}`} />{hasValuesSignal ? t.signalSent : t.valuesReport}</button>
                       <button onClick={() => toggleSaved(post.id)} className={`ms-auto rounded-lg p-2 transition hover:bg-[#edf3e9] ${isSaved ? "text-[#6b7f5a]" : "text-[#9aa59d] hover:text-[#66805c]"}`} aria-label={isSaved ? t.saved : t.save}><Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} /></button>
                     </div>
                   </article>;
