@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSession } from "@supabase/auth-helpers-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowUpLeft,
   Bell,
@@ -107,6 +109,11 @@ type Copy = {
   qualityError: string;
   topicLabel: string;
   meaningfulOnly: string;
+  uploadMedia: string;
+  mediaSelected: string;
+  noCircle: string;
+  saveFailed: string;
+  feedError: string;
 };
 
 const copy: Record<Locale, Copy> = {
@@ -179,6 +186,11 @@ const copy: Record<Locale, Copy> = {
     qualityError: "أضف قيمة واضحة قبل النشر العام: فكرة، تجربة، أو تفاصيل مفيدة.",
     topicLabel: "الموضوع",
     meaningfulOnly: "نشر ذو معنى فقط",
+    uploadMedia: "إضافة صورة أو فيديو",
+    mediaSelected: "تم اختيار ملف",
+    noCircle: "لا توجد دائرة خاصة بعد. اختر موضوعاً عاماً أو أنشئ دائرة أولاً.",
+    saveFailed: "تعذر حفظ المنشور. حاول مرة أخرى.",
+    feedError: "تعذر تحميل المنشورات الجديدة.",
   },
   en: {
     nav: { home: "Home", explore: "Explore", circles: "Circles", saved: "Saved", ads: "Ads" },
@@ -249,6 +261,11 @@ const copy: Record<Locale, Copy> = {
     qualityError: "Add clear value before posting publicly: an idea, experience, or useful detail.",
     topicLabel: "Topic",
     meaningfulOnly: "Meaningful posts only",
+    uploadMedia: "Add image or video",
+    mediaSelected: "File selected",
+    noCircle: "No private circle yet. Choose a public topic or create a circle first.",
+    saveFailed: "We couldn't save the post. Try again.",
+    feedError: "We couldn't load new posts.",
   },
   fr: {
     nav: { home: "Accueil", explore: "Découvrir", circles: "Cercles", saved: "Enregistrés", ads: "Annonces" },
@@ -319,6 +336,11 @@ const copy: Record<Locale, Copy> = {
     qualityError: "Ajoutez une vraie valeur avant de publier : une idée, une expérience ou un détail utile.",
     topicLabel: "Sujet",
     meaningfulOnly: "Publications porteuses de sens",
+    uploadMedia: "Ajouter une image ou une vidéo",
+    mediaSelected: "Fichier sélectionné",
+    noCircle: "Aucun cercle privé. Choisissez un sujet public ou créez d'abord un cercle.",
+    saveFailed: "La publication n'a pas pu être enregistrée.",
+    feedError: "Impossible de charger les nouveaux posts.",
   },
   zh: {
     nav: { home: "首页", explore: "探索", circles: "圈子", saved: "收藏", ads: "广告" },
@@ -389,6 +411,11 @@ const copy: Record<Locale, Copy> = {
     qualityError: "公开发布前请补充明确价值：想法、经历或有用细节。",
     topicLabel: "主题",
     meaningfulOnly: "只发布有意义的内容",
+    uploadMedia: "添加图片或视频",
+    mediaSelected: "已选择文件",
+    noCircle: "还没有私人圈子。请选择公共主题或先创建圈子。",
+    saveFailed: "无法保存动态，请重试。",
+    feedError: "无法加载新动态。",
   },
   es: {
     nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados", ads: "Anuncios" },
@@ -459,6 +486,11 @@ const copy: Record<Locale, Copy> = {
     qualityError: "Añade valor claro antes de publicar: una idea, experiencia o detalle útil.",
     topicLabel: "Tema",
     meaningfulOnly: "Solo contenido con sentido",
+    uploadMedia: "Añadir imagen o vídeo",
+    mediaSelected: "Archivo seleccionado",
+    noCircle: "Aún no tienes un círculo privado. Elige un tema público o crea uno primero.",
+    saveFailed: "No se pudo guardar la publicación.",
+    feedError: "No se pudieron cargar las publicaciones nuevas.",
   },
   hi: {
     nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए", ads: "विज्ञापन" },
@@ -529,6 +561,11 @@ const copy: Record<Locale, Copy> = {
     qualityError: "सार्वजनिक पोस्ट से पहले स्पष्ट मूल्य जोड़ें: विचार, अनुभव या उपयोगी विवरण।",
     topicLabel: "विषय",
     meaningfulOnly: "सिर्फ़ अर्थपूर्ण पोस्ट",
+    uploadMedia: "तस्वीर या वीडियो जोड़ें",
+    mediaSelected: "फ़ाइल चुनी गई",
+    noCircle: "अभी कोई निजी सर्कल नहीं है। सार्वजनिक विषय चुनें या पहले सर्कल बनाएँ।",
+    saveFailed: "पोस्ट सहेजी नहीं जा सकी। फिर कोशिश करें।",
+    feedError: "नई पोस्ट लोड नहीं हो सकीं।",
   },
 };
 
@@ -543,7 +580,33 @@ const languageNames: Record<Locale, string> = {
 
 const topics = ["تصوير", "أدب", "علوم", "تقنية", "حياة هادئة"];
 
-const posts = [
+type PostId = string | number;
+
+type FeedPost = {
+  id: PostId;
+  sensitive: boolean;
+  author: string;
+  handle: string;
+  initials: string;
+  tone: string;
+  circle: string;
+  time: string;
+  topic: string;
+  imageTone: string;
+  mediaUrl?: string;
+  mediaType?: "image" | "video";
+  body: Record<Locale, string>;
+  likes: number;
+  replies: number;
+  visibility?: "circle" | "topic";
+};
+
+type UserCircle = {
+  id: string;
+  name: string;
+};
+
+const posts: FeedPost[] = [
   {
     id: 1,
     sensitive: false,
@@ -771,6 +834,8 @@ const AdsPanel = ({ locale, t }: { locale: Locale; t: Copy }) => {
 };
 
 const Index = () => {
+  const session = useSession();
+  const mediaInputRef = useRef<HTMLInputElement>(null);
   const [locale, setLocale] = useState<Locale>("ar");
   const [languageOpen, setLanguageOpen] = useState(false);
   const [activeNav, setActiveNav] = useState<NavKey>("home");
@@ -778,15 +843,23 @@ const Index = () => {
   const [activeTopic, setActiveTopic] = useState("الكل");
   const [composerScope, setComposerScope] = useState<"circle" | "topic">("circle");
   const [composerTopic, setComposerTopic] = useState(topics[0]);
+  const [selectedCircleId, setSelectedCircleId] = useState("");
   const [draft, setDraft] = useState("");
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [remotePosts, setRemotePosts] = useState<FeedPost[]>([]);
+  const [localPosts, setLocalPosts] = useState<FeedPost[]>([]);
+  const [userCircles, setUserCircles] = useState<UserCircle[]>([]);
   const [publishError, setPublishError] = useState(false);
+  const [backendError, setBackendError] = useState("");
+  const [feedError, setFeedError] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [posted, setPosted] = useState(false);
-  const [insightfulPosts, setInsightfulPosts] = useState<number[]>([]);
-  const [saved, setSaved] = useState<number[]>([]);
-  const [reportedPosts, setReportedPosts] = useState<number[]>([]);
-  const [lowValuePosts, setLowValuePosts] = useState<number[]>([]);
-  const [valuesPosts, setValuesPosts] = useState<number[]>([]);
-  const [revealedPosts, setRevealedPosts] = useState<number[]>([]);
+  const [insightfulPosts, setInsightfulPosts] = useState<PostId[]>([]);
+  const [saved, setSaved] = useState<PostId[]>([]);
+  const [reportedPosts, setReportedPosts] = useState<PostId[]>([]);
+  const [lowValuePosts, setLowValuePosts] = useState<PostId[]>([]);
+  const [valuesPosts, setValuesPosts] = useState<PostId[]>([]);
+  const [revealedPosts, setRevealedPosts] = useState<PostId[]>([]);
   const [followedTopics, setFollowedTopics] = useState<string[]>(["تصوير", "أدب", "علوم"]);
   const t = copy[locale];
   const isRtl = locale === "ar";
@@ -797,35 +870,86 @@ const Index = () => {
     document.title = `أَثَر · ${t.title}`;
   }, [isRtl, locale, t.title]);
 
+  useEffect(() => {
+    if (!session?.user.id) return;
+    let cancelled = false;
+
+    const loadFeed = async () => {
+      const [{ data: feedData, error: postsError }, { data: circlesData }] = await Promise.all([
+        supabase.from("posts").select("id, author_id, topic_tag, content, media_url, created_at, visibility, is_blurred").order("created_at", { ascending: false }).limit(50),
+        supabase.from("circles").select("id, name").order("created_at", { ascending: true }),
+      ]);
+
+      if (cancelled) return;
+      setFeedError(Boolean(postsError));
+      setUserCircles((circlesData ?? []) as UserCircle[]);
+      if (circlesData?.[0]?.id) setSelectedCircleId((current) => current || circlesData[0].id);
+
+      const mappedPosts: FeedPost[] = await Promise.all((feedData ?? []).map(async (item) => {
+        const content = String(item.content ?? "");
+        const createdAt = item.created_at ? new Date(item.created_at) : new Date();
+        const { data: signedMedia } = item.media_url
+          ? await supabase.storage.from("athar-media").createSignedUrl(item.media_url, 3600)
+          : { data: null };
+        return {
+          id: item.id,
+          sensitive: Boolean(item.is_blurred),
+          author: "عضو في أَثَر",
+          handle: "athar_member",
+          initials: "أ",
+          tone: "bg-[#e6eee1] text-[#6b7f5a]",
+          circle: item.visibility === "circle" ? "دائرة خاصة" : "عام",
+          time: createdAt.toLocaleDateString(locale, { month: "short", day: "numeric" }),
+          topic: item.topic_tag || "عام",
+          imageTone: "bg-[#edf2e9]",
+          mediaUrl: signedMedia?.signedUrl,
+          mediaType: /\.(mp4|webm|mov|m4v)$/i.test(String(item.media_url ?? "")) ? "video" : "image",
+          body: { ar: content, en: content, fr: content, zh: content, es: content, hi: content },
+          likes: 0,
+          replies: 0,
+          visibility: item.visibility === "circle" ? "circle" : "topic",
+        };
+      }));
+      setRemotePosts(mappedPosts);
+    };
+
+    void loadFeed();
+    return () => {
+      cancelled = true;
+    };
+  }, [locale, session?.user.id]);
+
+  const allPosts = useMemo(() => [...localPosts, ...remotePosts, ...posts], [localPosts, remotePosts]);
+
   const visiblePosts = useMemo(() => {
-    const scopedPosts = activeTab === "circles" ? posts.filter((post) => post.circle !== "عام") : activeTab === "topics" ? posts.filter((post) => post.circle === "عام") : posts;
+    const scopedPosts = activeTab === "circles" ? allPosts.filter((post) => post.circle !== "عام") : activeTab === "topics" ? allPosts.filter((post) => post.circle === "عام") : allPosts;
     if (activeTopic !== "الكل" && activeTopic !== "All") {
       return scopedPosts.filter((post) => post.topic === activeTopic);
     }
     return scopedPosts;
-  }, [activeTab, activeTopic]);
+  }, [activeTab, activeTopic, allPosts]);
 
-  const toggleInsightful = (id: number) => {
+  const toggleInsightful = (id: PostId) => {
     setInsightfulPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
-  const toggleSaved = (id: number) => {
+  const toggleSaved = (id: PostId) => {
     setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
-  const reportPost = (id: number) => {
+  const reportPost = (id: PostId) => {
     setReportedPosts((current) => current.includes(id) ? current : [...current, id]);
   };
 
-  const toggleLowValueSignal = (id: number) => {
+  const toggleLowValueSignal = (id: PostId) => {
     setLowValuePosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
-  const toggleValuesSignal = (id: number) => {
+  const toggleValuesSignal = (id: PostId) => {
     setValuesPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
-  const toggleSensitivePost = (id: number) => {
+  const toggleSensitivePost = (id: PostId) => {
     setRevealedPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
@@ -833,16 +957,80 @@ const Index = () => {
     setFollowedTopics((current) => current.includes(topic) ? current.filter((item) => item !== topic) : [...current, topic]);
   };
 
-  const publish = () => {
-    if (!draft.trim()) return;
-    if (composerScope === "topic" && draft.trim().length < 24) {
+  const publish = async () => {
+    const content = draft.trim();
+    if (!content || !session?.user.id || saving) return;
+    if (composerScope === "topic" && content.length < 24) {
       setPublishError(true);
       return;
     }
+    if (composerScope === "circle" && !selectedCircleId) {
+      setBackendError(t.noCircle);
+      return;
+    }
+
     setPublishError(false);
-    setDraft("");
-    setPosted(true);
-    window.setTimeout(() => setPosted(false), 2800);
+    setBackendError("");
+    setSaving(true);
+    let mediaPath: string | null = null;
+
+    try {
+      if (mediaFile) {
+        const extension = mediaFile.name.split(".").pop()?.toLowerCase() || "bin";
+        mediaPath = `${session.user.id}/${crypto.randomUUID()}.${extension}`;
+        const { error: uploadError } = await supabase.storage.from("athar-media").upload(mediaPath, mediaFile, {
+          contentType: mediaFile.type,
+          upsert: false,
+        });
+        if (uploadError) throw uploadError;
+      }
+
+      const visibility = composerScope === "circle" ? "circle" : "topic";
+      const { data: createdPost, error: insertError } = await supabase.from("posts").insert({
+        author_id: session.user.id,
+        circle_id: composerScope === "circle" ? selectedCircleId : null,
+        topic_tag: composerTopic,
+        content,
+        media_url: mediaPath,
+        visibility,
+        moderation_status: visibility === "topic" ? "pending" : "approved",
+        is_blurred: false,
+      }).select("id, topic_tag, content, media_url, created_at, visibility, is_blurred").single();
+
+      if (insertError || !createdPost) throw insertError ?? new Error("Post was not created");
+      const { data: signedMedia } = createdPost.media_url
+        ? await supabase.storage.from("athar-media").createSignedUrl(createdPost.media_url, 3600)
+        : { data: null };
+      const localPost: FeedPost = {
+        id: createdPost.id,
+        sensitive: Boolean(createdPost.is_blurred),
+        author: "أنت",
+        handle: "you",
+        initials: "ل",
+        tone: "bg-[#eadfd4] text-[#886d53]",
+        circle: visibility === "circle" ? (userCircles.find((circle) => circle.id === selectedCircleId)?.name ?? "دائرة خاصة") : "عام",
+        time: t.justNow,
+        topic: createdPost.topic_tag || composerTopic,
+        imageTone: "bg-[#edf2e9]",
+        mediaUrl: signedMedia?.signedUrl,
+        mediaType: mediaFile?.type.startsWith("video/") ? "video" : "image",
+        body: { ar: content, en: content, fr: content, zh: content, es: content, hi: content },
+        likes: 0,
+        replies: 0,
+        visibility,
+      };
+      setLocalPosts((current) => [localPost, ...current]);
+      setDraft("");
+      setMediaFile(null);
+      if (mediaInputRef.current) mediaInputRef.current.value = "";
+      setPosted(true);
+      window.setTimeout(() => setPosted(false), 2800);
+    } catch {
+      if (mediaPath) await supabase.storage.from("athar-media").remove([mediaPath]);
+      setBackendError(t.saveFailed);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getNavLabel = (key: NavKey) => t.nav[key];
@@ -881,8 +1069,8 @@ const Index = () => {
             <p className="mt-1 text-xs leading-5 text-[#89958a]">{t.noNumbers}</p>
           </div>
           <div className="mt-4 flex items-center justify-between px-3 text-[#8a958b]">
-            <button className="flex items-center gap-2 text-xs font-medium hover:text-[#526550]"><Settings2 className="h-4 w-4" />{t.profile}</button>
-            <button aria-label={t.profile} className="rounded-full p-1 hover:bg-[#edf0e8]"><CircleUserRound className="h-5 w-5" /></button>
+            <button onClick={() => supabase.auth.signOut()} className="flex items-center gap-2 text-xs font-medium hover:text-[#526550]"><Settings2 className="h-4 w-4" />{t.profile}</button>
+            <button onClick={() => supabase.auth.signOut()} aria-label={t.profile} className="rounded-full p-1 hover:bg-[#edf0e8]"><CircleUserRound className="h-5 w-5" /></button>
           </div>
         </aside>
 
@@ -939,6 +1127,7 @@ const Index = () => {
                 </div>
               </div>
 
+              {feedError && <div className="mb-4 rounded-2xl border border-[#f0d6cf] bg-[#fff4f1] px-4 py-3 text-xs font-semibold text-[#a65e52]">{t.feedError}</div>}
               <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-4 shadow-[0_5px_24px_rgba(68,80,69,0.035)] sm:p-5">
                 <div className="flex gap-3">
                   <Avatar className="h-10 w-10 shrink-0"><AvatarFallback className="bg-[#eadfd4] font-semibold text-[#886d53]">ل</AvatarFallback></Avatar>
@@ -948,12 +1137,15 @@ const Index = () => {
                       <button onClick={() => { setComposerScope("circle"); setPublishError(false); }} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${composerScope === "circle" ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-[#f1f4ee]"}`}>{t.privateCircle}</button>
                       <button onClick={() => { setComposerScope("topic"); setPublishError(false); }} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${composerScope === "topic" ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-[#f1f4ee]"}`}>{t.publicTopic}</button>
                       {composerScope === "topic" && <select value={composerTopic} onChange={(event) => setComposerTopic(event.target.value)} aria-label={t.topicLabel} className="rounded-xl border border-[#dce5d9] bg-[#f8faf5] px-3 py-2 text-xs font-semibold text-[#647762] outline-none focus:ring-2 focus:ring-[#cadbc5]">{topics.map((topic) => <option key={topic}>{topic}</option>)}</select>}
+                      {composerScope === "circle" && userCircles.length > 0 && <select value={selectedCircleId} onChange={(event) => setSelectedCircleId(event.target.value)} aria-label={t.privateCircle} className="max-w-[170px] rounded-xl border border-[#dce5d9] bg-[#f8faf5] px-3 py-2 text-xs font-semibold text-[#647762] outline-none focus:ring-2 focus:ring-[#cadbc5]">{userCircles.map((circle) => <option key={circle.id} value={circle.id}>{circle.name}</option>)}</select>}
                     </div>
+                    {composerScope === "circle" && userCircles.length === 0 && <div className="mb-3 rounded-xl bg-[#f6efe4] px-3 py-2 text-xs font-semibold leading-5 text-[#967b5d]">{t.noCircle}</div>}
                     {composerScope === "topic" && <div className="mb-3 flex items-start gap-2 rounded-xl bg-[#f0f5ed] px-3 py-2 text-xs leading-5 text-[#728570]"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#73916b]" /><span><strong className="font-bold text-[#526b4d]">{t.qualityGate}</strong> · {t.qualityGateDesc}</span></div>}
                     {publishError && <div className="mb-3 rounded-xl bg-[#f8e9e5] px-3 py-2 text-xs font-semibold leading-5 text-[#a65e52]">{t.qualityError}</div>}
+                    {backendError && <div className="mb-3 rounded-xl bg-[#f8e9e5] px-3 py-2 text-xs font-semibold leading-5 text-[#a65e52]">{backendError}</div>}
                     <div className="flex items-center justify-between border-t border-[#edf0ea] pt-3">
-                      <div className="flex items-center gap-2 text-xs text-[#93a096]"><button className="rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]"><Plus className="h-4 w-4" /></button><span>{composerScope === "circle" ? t.privateCircle : `${t.publicTopic} · ${composerTopic}`}</span></div>
-                      <Button onClick={publish} size="sm" className="rounded-xl bg-[#6b7f5a] px-4 text-xs font-semibold text-white shadow-[0_5px_12px_rgba(107,127,90,0.18)] hover:bg-[#587047]">{t.publish}<Send className="h-3.5 w-3.5" /></Button>
+                      <div className="flex min-w-0 items-center gap-2 text-xs text-[#93a096]"><label className="shrink-0 cursor-pointer rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]" title={t.uploadMedia}><Plus className="h-4 w-4" /><input ref={mediaInputRef} type="file" accept="image/*,video/*" className="sr-only" onChange={(event) => setMediaFile(event.target.files?.[0] ?? null)} /></label><span className="truncate">{mediaFile ? `${t.mediaSelected}: ${mediaFile.name}` : composerScope === "circle" ? t.privateCircle : `${t.publicTopic} · ${composerTopic}`}</span></div>
+                      <Button onClick={publish} disabled={saving} size="sm" className="rounded-xl bg-[#6b7f5a] px-4 text-xs font-semibold text-white shadow-[0_5px_12px_rgba(107,127,90,0.18)] hover:bg-[#587047]">{saving ? "…" : t.publish}<Send className="h-3.5 w-3.5" /></Button>
                     </div>
                   </div>
                 </div>
@@ -984,6 +1176,7 @@ const Index = () => {
                       <button aria-label="More" className="rounded-lg p-1 text-[#a4ada5] hover:bg-[#f0f2ed] hover:text-[#607260]"><MoreHorizontal className="h-4 w-4" /></button>
                     </div>
                     <p className="mt-5 text-[15px] leading-8 text-[#4d5b52]">{post.body[locale]}</p>
+                    {post.mediaUrl && <div className="mt-4 overflow-hidden rounded-[22px] border border-[#e0e6dc] bg-[#edf2e9]">{post.mediaType === "video" ? <video src={post.mediaUrl} controls className="max-h-[420px] w-full object-cover" /> : <img src={post.mediaUrl} alt="" className="max-h-[420px] w-full object-cover" />}</div>}
                     {post.sensitive && <div className="relative mt-4 overflow-hidden rounded-[22px] border border-[#ded8d0] bg-[#e9e2d9]">
                       <div className={`relative h-56 overflow-hidden transition duration-500 ${isRevealed ? "" : "blur-[18px] scale-[1.04]"} ${post.imageTone}`} aria-hidden={!isRevealed}>
                         <div className="absolute inset-x-10 top-8 h-32 rounded-[42%] bg-[#9d7f75] opacity-80" />
