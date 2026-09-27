@@ -1,17 +1,616 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  ArrowUpLeft,
+  Bell,
+  Bookmark,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  CircleUserRound,
+  Compass,
+  Feather,
+  Globe2,
+  Heart,
+  Home,
+  Leaf,
+  Languages,
+  MessageCircle,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Send,
+  Settings2,
+  ShieldCheck,
+  Sparkles,
+  UsersRound,
+} from "lucide-react";
+import "../App.css";
 
-import { MadeWithDyad } from "@/components/made-with-dyad";
+type Locale = "ar" | "en" | "fr" | "zh" | "es" | "hi";
+type NavKey = "home" | "explore" | "circles" | "saved";
+
+type Copy = {
+  nav: { home: string; explore: string; circles: string; saved: string };
+  greeting: string;
+  title: string;
+  subtitle: string;
+  timeline: string;
+  timelineDesc: string;
+  newLabel: string;
+  allFollowing: string;
+  myCircles: string;
+  myTopics: string;
+  writePlaceholder: string;
+  publish: string;
+  published: string;
+  noMore: string;
+  noMoreDesc: string;
+  mindful: string;
+  mindfulDesc: string;
+  seeAll: string;
+  circlesTitle: string;
+  topicsTitle: string;
+  follow: string;
+  following: string;
+  close: string;
+  allCaught: string;
+  search: string;
+  language: string;
+  profile: string;
+  minutes: string;
+  justNow: string;
+  replies: string;
+  share: string;
+  saved: string;
+  save: string;
+  liked: string;
+  like: string;
+  noNumbers: string;
+  publicCircle: string;
+  quietSpace: string;
+};
+
+const copy: Record<Locale, Copy> = {
+  ar: {
+    nav: { home: "الرئيسية", explore: "اكتشف", circles: "دوائري", saved: "المحفوظات" },
+    greeting: "صباح هادئ، ليان",
+    title: "مساحتك الهادئة",
+    subtitle: "كل ما تراه هنا اختاره وقتك، لا خوارزمية.",
+    timeline: "التسلسل الزمني فقط",
+    timelineDesc: "الأحدث أولاً. دون اقتراحات عشوائية أو تمرير لا ينتهي.",
+    newLabel: "منشور جديد",
+    allFollowing: "كل ما أتابعه",
+    myCircles: "دوائري",
+    myTopics: "مواضيعي",
+    writePlaceholder: "ما الأثر الذي ترغب في تركه اليوم؟",
+    publish: "نشر الأثر",
+    published: "تم نشر أثرك",
+    noMore: "اطّلعت على كل جديد",
+    noMoreDesc: "خذ لحظة لنفسك. لا شيء ينتظرك هنا الآن.",
+    mindful: "مساحة للاكتفاء",
+    mindfulDesc: "حين تنتهي من الجديد، نخبرك. لا نملأ وقتك بما لم تطلبه.",
+    seeAll: "عرض الكل",
+    circlesTitle: "دوائرك",
+    topicsTitle: "مواضيع تتابعها",
+    follow: "متابعة",
+    following: "تتابع",
+    close: "إغلاق",
+    allCaught: "انتهى الجديد",
+    search: "ابحث في أَثَر",
+    language: "اللغة",
+    profile: "الملف الشخصي",
+    minutes: "د",
+    justNow: "الآن",
+    replies: "ردود",
+    share: "مشاركة",
+    saved: "محفوظ",
+    save: "حفظ",
+    liked: "أعجبك",
+    like: "إعجاب",
+    noNumbers: "بلا أرقام للمتابعين",
+    publicCircle: "عام",
+    quietSpace: "هدوء مقصود",
+  },
+  en: {
+    nav: { home: "Home", explore: "Explore", circles: "Circles", saved: "Saved" },
+    greeting: "A quiet morning, Layan",
+    title: "Your quiet space",
+    subtitle: "Everything here arrives by time, never by an algorithm.",
+    timeline: "Strictly chronological",
+    timelineDesc: "Newest first. No random suggestions or endless scroll.",
+    newLabel: "New post",
+    allFollowing: "Everything I follow",
+    myCircles: "My circles",
+    myTopics: "My topics",
+    writePlaceholder: "What trace would you like to leave today?",
+    publish: "Leave a trace",
+    published: "Your trace was shared",
+    noMore: "You are all caught up",
+    noMoreDesc: "Take a moment for yourself. Nothing else is waiting here.",
+    mindful: "A space for enough",
+    mindfulDesc: "When you reach the end, we tell you. We never fill your time uninvited.",
+    seeAll: "See all",
+    circlesTitle: "Your circles",
+    topicsTitle: "Topics you follow",
+    follow: "Follow",
+    following: "Following",
+    close: "Close",
+    allCaught: "All caught up",
+    search: "Search Athar",
+    language: "Language",
+    profile: "Profile",
+    minutes: "m",
+    justNow: "Just now",
+    replies: "replies",
+    share: "Share",
+    saved: "Saved",
+    save: "Save",
+    liked: "Liked",
+    like: "Like",
+    noNumbers: "No follower counts",
+    publicCircle: "Public",
+    quietSpace: "Intentional quiet",
+  },
+  fr: {
+    nav: { home: "Accueil", explore: "Découvrir", circles: "Cercles", saved: "Enregistrés" },
+    greeting: "Un matin calme, Layan",
+    title: "Votre espace calme",
+    subtitle: "Tout arrive ici par le temps, jamais par un algorithme.",
+    timeline: "Chronologique, simplement",
+    timelineDesc: "Le plus récent d'abord. Sans suggestions ni défilement infini.",
+    newLabel: "Nouveau post",
+    allFollowing: "Tout ce que je suis",
+    myCircles: "Mes cercles",
+    myTopics: "Mes sujets",
+    writePlaceholder: "Quelle trace souhaitez-vous laisser aujourd'hui ?",
+    publish: "Laisser une trace",
+    published: "Votre trace a été publiée",
+    noMore: "Vous avez tout vu",
+    noMoreDesc: "Prenez un instant pour vous. Rien ne vous attend ici.",
+    mindful: "L'espace du suffisant",
+    mindfulDesc: "Quand le nouveau s'arrête, nous vous le disons. Sans remplir votre temps.",
+    seeAll: "Tout voir",
+    circlesTitle: "Vos cercles",
+    topicsTitle: "Sujets suivis",
+    follow: "Suivre",
+    following: "Suivi",
+    close: "Fermer",
+    allCaught: "Tout est vu",
+    search: "Rechercher dans Athar",
+    language: "Langue",
+    profile: "Profil",
+    minutes: "m",
+    justNow: "À l'instant",
+    replies: "réponses",
+    share: "Partager",
+    saved: "Enregistré",
+    save: "Enregistrer",
+    liked: "Aimé",
+    like: "J'aime",
+    noNumbers: "Sans compteurs d'abonnés",
+    publicCircle: "Public",
+    quietSpace: "Calme choisi",
+  },
+  zh: {
+    nav: { home: "首页", explore: "探索", circles: "圈子", saved: "收藏" },
+    greeting: "早安，Layan",
+    title: "你的宁静空间",
+    subtitle: "这里的一切按时间到来，从不由算法决定。",
+    timeline: "严格按时间排列",
+    timelineDesc: "最新优先。没有随机推荐，也没有无限滚动。",
+    newLabel: "新动态",
+    allFollowing: "我关注的一切",
+    myCircles: "我的圈子",
+    myTopics: "我的主题",
+    writePlaceholder: "今天想留下什么痕迹？",
+    publish: "留下痕迹",
+    published: "你的痕迹已发布",
+    noMore: "你已看完所有新内容",
+    noMoreDesc: "给自己片刻时间。这里暂时没有更多内容了。",
+    mindful: "知足空间",
+    mindfulDesc: "看到尽头时，我们会告诉你，不会用未请求的内容填满时间。",
+    seeAll: "查看全部",
+    circlesTitle: "你的圈子",
+    topicsTitle: "关注的主题",
+    follow: "关注",
+    following: "已关注",
+    close: "关闭",
+    allCaught: "已全部看完",
+    search: "搜索 Athar",
+    language: "语言",
+    profile: "个人资料",
+    minutes: "分钟",
+    justNow: "刚刚",
+    replies: "条回复",
+    share: "分享",
+    saved: "已收藏",
+    save: "收藏",
+    liked: "已喜欢",
+    like: "喜欢",
+    noNumbers: "不显示关注者数量",
+    publicCircle: "公开",
+    quietSpace: "有意识的宁静",
+  },
+  es: {
+    nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados" },
+    greeting: "Una mañana tranquila, Layan",
+    title: "Tu espacio tranquilo",
+    subtitle: "Todo llega aquí por el tiempo, nunca por un algoritmo.",
+    timeline: "Solo cronológico",
+    timelineDesc: "Lo más reciente primero. Sin sugerencias ni scroll infinito.",
+    newLabel: "Nueva publicación",
+    allFollowing: "Todo lo que sigo",
+    myCircles: "Mis círculos",
+    myTopics: "Mis temas",
+    writePlaceholder: "¿Qué huella quieres dejar hoy?",
+    publish: "Dejar una huella",
+    published: "Tu huella se ha publicado",
+    noMore: "Ya has visto todo lo nuevo",
+    noMoreDesc: "Tómate un momento. Nada más te espera aquí.",
+    mindful: "Un espacio para lo suficiente",
+    mindfulDesc: "Cuando llegues al final, te avisamos. Nunca llenamos tu tiempo sin permiso.",
+    seeAll: "Ver todo",
+    circlesTitle: "Tus círculos",
+    topicsTitle: "Temas que sigues",
+    follow: "Seguir",
+    following: "Siguiendo",
+    close: "Cerrar",
+    allCaught: "Todo al día",
+    search: "Buscar en Athar",
+    language: "Idioma",
+    profile: "Perfil",
+    minutes: "min",
+    justNow: "Ahora",
+    replies: "respuestas",
+    share: "Compartir",
+    saved: "Guardado",
+    save: "Guardar",
+    liked: "Te gusta",
+    like: "Me gusta",
+    noNumbers: "Sin números de seguidores",
+    publicCircle: "Público",
+    quietSpace: "Calma intencional",
+  },
+  hi: {
+    nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए" },
+    greeting: "शांत सुबह, Layan",
+    title: "आपकी शांत जगह",
+    subtitle: "यहाँ सब कुछ समय के अनुसार आता है, एल्गोरिदम के अनुसार नहीं।",
+    timeline: "सिर्फ़ कालानुक्रमिक",
+    timelineDesc: "नवीनतम पहले। बिना सुझाव या अंतहीन स्क्रॉल के।",
+    newLabel: "नई पोस्ट",
+    allFollowing: "मैं जिसे फ़ॉलो करता हूँ",
+    myCircles: "मेरे सर्कल",
+    myTopics: "मेरे विषय",
+    writePlaceholder: "आज आप कौन-सी छाप छोड़ना चाहेंगे?",
+    publish: "छाप छोड़ें",
+    published: "आपकी छाप साझा हो गई",
+    noMore: "आपने सब नया देख लिया",
+    noMoreDesc: "अपने लिए एक पल लें। यहाँ अभी कुछ और नहीं है।",
+    mindful: "पर्याप्तता की जगह",
+    mindfulDesc: "जब आप अंत तक पहुँचेंगे, हम बताएँगे। आपके समय को अनचाही चीज़ों से नहीं भरेंगे।",
+    seeAll: "सब देखें",
+    circlesTitle: "आपके सर्कल",
+    topicsTitle: "आपके फ़ॉलो किए विषय",
+    follow: "फ़ॉलो करें",
+    following: "फ़ॉलो कर रहे हैं",
+    close: "बंद करें",
+    allCaught: "सब देख लिया",
+    search: "Athar में खोजें",
+    language: "भाषा",
+    profile: "प्रोफ़ाइल",
+    minutes: "मि",
+    justNow: "अभी",
+    replies: "जवाब",
+    share: "साझा करें",
+    saved: "सहेजा गया",
+    save: "सहेजें",
+    liked: "पसंद किया",
+    like: "पसंद",
+    noNumbers: "फ़ॉलोअर संख्या नहीं",
+    publicCircle: "सार्वजनिक",
+    quietSpace: "सोची-समझी शांति",
+  },
+};
+
+const languageNames: Record<Locale, string> = {
+  ar: "العربية",
+  en: "English",
+  fr: "Français",
+  zh: "中文",
+  es: "Español",
+  hi: "हिन्दी",
+};
+
+const topics = ["تصوير", "أدب", "علوم", "تقنية", "حياة هادئة"];
+
+const posts = [
+  {
+    id: 1,
+    author: "سارة المنصور",
+    handle: "sara.m",
+    initials: "س",
+    tone: "bg-[#dbe5d3] text-[#4f6749]",
+    circle: "العائلة والأصدقاء",
+    time: "8",
+    topic: "تصوير",
+    body: {
+      ar: "في الصباحات التي لا نستعجلها، نرى أشياء صغيرة كانت تختبئ خلف الضجيج. صورة من نافذتي هذا الصباح.",
+      en: "On mornings we don't rush, we notice the small things hiding behind the noise. A view from my window today.",
+      fr: "Les matins où l'on ne se presse pas révèlent les petites choses cachées derrière le bruit. Une vue de ma fenêtre.",
+      zh: "在不匆忙的早晨，我们会看见藏在喧嚣背后的细小事物。这是今天窗外的风景。",
+      es: "En las mañanas sin prisa vemos las cosas pequeñas que se esconden tras el ruido. Una vista desde mi ventana.",
+      hi: "जब सुबह में जल्दबाज़ी नहीं होती, तो शोर के पीछे छुपी छोटी चीज़ें दिखती हैं। आज मेरी खिड़की से एक दृश्य।",
+    },
+    likes: 14,
+    replies: 3,
+  },
+  {
+    id: 2,
+    author: "نادر يونس",
+    handle: "nader.reads",
+    initials: "ن",
+    tone: "bg-[#e9dfd2] text-[#876c51]",
+    circle: "المعارف والعمل",
+    time: "24",
+    topic: "أدب",
+    body: {
+      ar: "الكتاب الجيد لا يعطيك إجابات أسرع، بل يمنحك أسئلة أعمق تعيش معها قليلاً.",
+      en: "A good book doesn't give faster answers. It gives deeper questions to live with for a while.",
+      fr: "Un bon livre ne donne pas des réponses plus rapides. Il offre des questions plus profondes à habiter.",
+      zh: "一本好书不会给你更快的答案，而是留下值得慢慢相处的深刻问题。",
+      es: "Un buen libro no da respuestas más rápidas. Deja preguntas más profundas para vivir con ellas.",
+      hi: "एक अच्छी किताब तेज़ जवाब नहीं देती। वह कुछ समय साथ रखने के लिए गहरे सवाल देती है।",
+    },
+    likes: 28,
+    replies: 6,
+  },
+  {
+    id: 3,
+    author: "عمر حداد",
+    handle: "omar.fieldnotes",
+    initials: "ع",
+    tone: "bg-[#d9e2e5] text-[#58717b]",
+    circle: "عام",
+    time: "41",
+    topic: "علوم",
+    body: {
+      ar: "تذكير لطيف: ليس كل ما يمكن قياسه يستحق أن نقيسه. بعض الأشياء تُعرف بالإحساس فقط.",
+      en: "A gentle reminder: not everything that can be measured is worth measuring. Some things are known only by feeling.",
+      fr: "Un doux rappel : tout ce qui se mesure ne mérite pas de l'être. Certaines choses se ressentent simplement.",
+      zh: "温柔地提醒自己：并非所有能被衡量的事都值得衡量。有些事只能用心感受。",
+      es: "Un recordatorio amable: no todo lo que se puede medir merece ser medido. Algunas cosas se conocen sintiéndolas.",
+      hi: "एक हल्की याद: हर चीज़ जिसे मापा जा सकता है, उसे मापना ज़रूरी नहीं। कुछ चीज़ें सिर्फ़ महसूस होती हैं।",
+    },
+    likes: 36,
+    replies: 8,
+  },
+];
+
+const navItems: { key: NavKey; icon: typeof Home }[] = [
+  { key: "home", icon: Home },
+  { key: "explore", icon: Compass },
+  { key: "circles", icon: UsersRound },
+  { key: "saved", icon: Bookmark },
+];
 
 const Index = () => {
+  const [locale, setLocale] = useState<Locale>("ar");
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [activeNav, setActiveNav] = useState<NavKey>("home");
+  const [activeTab, setActiveTab] = useState<"all" | "circles" | "topics">("all");
+  const [activeTopic, setActiveTopic] = useState("الكل");
+  const [draft, setDraft] = useState("");
+  const [posted, setPosted] = useState(false);
+  const [liked, setLiked] = useState<number[]>([]);
+  const [saved, setSaved] = useState<number[]>([]);
+  const [followedTopics, setFollowedTopics] = useState<string[]>(["تصوير", "أدب", "علوم"]);
+  const t = copy[locale];
+  const isRtl = locale === "ar";
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+    document.documentElement.dir = isRtl ? "rtl" : "ltr";
+    document.title = `أَثَر · ${t.title}`;
+  }, [isRtl, locale, t.title]);
+
+  const visiblePosts = useMemo(() => {
+    if (activeTopic !== "الكل" && activeTopic !== "All") {
+      return posts.filter((post) => post.topic === activeTopic);
+    }
+    return posts;
+  }, [activeTopic]);
+
+  const toggleLike = (id: number) => {
+    setLiked((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  };
+
+  const toggleSaved = (id: number) => {
+    setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  };
+
+  const toggleTopic = (topic: string) => {
+    setFollowedTopics((current) => current.includes(topic) ? current.filter((item) => item !== topic) : [...current, topic]);
+  };
+
+  const publish = () => {
+    if (!draft.trim()) return;
+    setDraft("");
+    setPosted(true);
+    window.setTimeout(() => setPosted(false), 2800);
+  };
+
+  const getNavLabel = (key: NavKey) => t.nav[key];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">
-          Start building your amazing project here!
-        </p>
+    <div className="athar-app min-h-screen bg-[#f5f3ee] text-[#28342f]" dir={isRtl ? "rtl" : "ltr"}>
+      <div className="mx-auto flex min-h-screen w-full max-w-[1600px]">
+        <aside className="hidden w-[248px] shrink-0 flex-col border-e border-[#dfe2d9] bg-[#f9f8f4] px-5 py-7 lg:flex">
+          <div className="flex items-center gap-3 px-3">
+            <div className="brand-mark flex h-11 w-11 items-center justify-center rounded-[17px] bg-[#6b7f5a] text-[#fbfaf5] shadow-[0_8px_20px_rgba(107,127,90,0.18)]">
+              <Feather className="h-5 w-5" strokeWidth={1.7} />
+            </div>
+            <div>
+              <div className="font-display text-[25px] font-semibold leading-none tracking-[-0.04em]">أَثَر</div>
+              <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.26em] text-[#819087]">CHRONOS</div>
+            </div>
+          </div>
+
+          <div className="mt-14 space-y-2">
+            {navItems.map(({ key, icon: Icon }) => (
+              <button
+                key={key}
+                onClick={() => setActiveNav(key)}
+                className={`nav-item flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${activeNav === key ? "bg-[#e4ebdf] text-[#48623f]" : "text-[#7a877f] hover:bg-[#eef1ea] hover:text-[#4d5f53]"}`}
+              >
+                <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
+                <span>{getNavLabel(key)}</span>
+                {key === "home" && <span className="ms-auto h-1.5 w-1.5 rounded-full bg-[#6b7f5a]" />}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-auto rounded-[24px] border border-[#e4e6dd] bg-[#f2f5ed] p-4">
+            <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl bg-[#dfe9d9] text-[#66805b]"><Leaf className="h-4 w-4" /></div>
+            <p className="text-sm font-semibold text-[#516252]">{t.quietSpace}</p>
+            <p className="mt-1 text-xs leading-5 text-[#89958a]">{t.noNumbers}</p>
+          </div>
+          <div className="mt-4 flex items-center justify-between px-3 text-[#8a958b]">
+            <button className="flex items-center gap-2 text-xs font-medium hover:text-[#526550]"><Settings2 className="h-4 w-4" />{t.profile}</button>
+            <button aria-label={t.profile} className="rounded-full p-1 hover:bg-[#edf0e8]"><CircleUserRound className="h-5 w-5" /></button>
+          </div>
+        </aside>
+
+        <main className="min-w-0 flex-1 px-4 pb-12 sm:px-7 lg:px-12">
+          <header className="mx-auto flex max-w-[1030px] items-center justify-between py-5 sm:py-7">
+            <div className="flex items-center gap-3 lg:hidden">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#6b7f5a] text-white"><Feather className="h-5 w-5" /></div>
+              <span className="font-display text-2xl font-semibold">أَثَر</span>
+            </div>
+            <div className="hidden items-center gap-2 text-xs font-medium text-[#849087] lg:flex"><span className="h-2 w-2 rounded-full bg-[#87a174]" /> {t.timeline}</div>
+            <div className="ms-auto flex items-center gap-2 sm:gap-3">
+              <button className="hidden items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-[#809087] transition hover:bg-white sm:flex"><Search className="h-4 w-4" />{t.search}</button>
+              <div className="relative">
+                <button onClick={() => setLanguageOpen((open) => !open)} className="flex items-center gap-2 rounded-xl border border-[#e2e5dc] bg-[#fbfaf7] px-3 py-2 text-xs font-semibold text-[#607163] shadow-sm transition hover:border-[#cbd7c6]">
+                  <Globe2 className="h-4 w-4" /><span>{languageNames[locale]}</span><ChevronDown className="h-3.5 w-3.5" />
+                </button>
+                {languageOpen && (
+                  <div className="absolute end-0 top-12 z-20 w-44 rounded-2xl border border-[#e2e5dc] bg-white p-2 shadow-[0_18px_45px_rgba(65,81,69,0.14)]">
+                    <p className="px-3 pb-2 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a0aaa1]">{t.language}</p>
+                    {(Object.keys(languageNames) as Locale[]).map((item) => (
+                      <button key={item} onClick={() => { setLocale(item); setLanguageOpen(false); }} className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm transition ${locale === item ? "bg-[#edf3e9] font-semibold text-[#506c4a]" : "text-[#718078] hover:bg-[#f5f7f3]"}`}>
+                        {languageNames[item]} {locale === item && <Check className="h-3.5 w-3.5" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button aria-label="Notifications" className="relative rounded-xl border border-[#e2e5dc] bg-[#fbfaf7] p-2.5 text-[#718078] shadow-sm hover:text-[#506c4a]"><Bell className="h-4 w-4" /><span className="absolute end-2 top-2 h-1.5 w-1.5 rounded-full bg-[#c7795e]" /></button>
+              <Avatar className="h-9 w-9 border-2 border-white shadow-sm"><AvatarFallback className="bg-[#dbe5d3] text-sm font-semibold text-[#536b4b]">ل</AvatarFallback></Avatar>
+            </div>
+          </header>
+
+          <div className="mx-auto grid max-w-[1030px] gap-7 xl:grid-cols-[minmax(0,1fr)_286px]">
+            <section className="min-w-0">
+              <div className="mb-6 flex items-end justify-between gap-4">
+                <div>
+                  <p className="mb-2 text-sm font-medium text-[#91a094]">{t.greeting}</p>
+                  <h1 className="font-display text-[clamp(2.25rem,5vw,3.45rem)] font-semibold leading-[1.08] tracking-[-0.055em] text-[#2e3b34]">{activeNav === "explore" ? t.nav.explore : activeNav === "circles" ? t.nav.circles : activeNav === "saved" ? t.nav.saved : t.title}</h1>
+                  <p className="mt-3 max-w-lg text-sm leading-6 text-[#859189]">{t.subtitle}</p>
+                </div>
+                <div className="hidden rounded-full border border-[#e0e7db] bg-[#f8faf5] px-3 py-2 text-[11px] font-semibold text-[#78906f] sm:flex sm:items-center sm:gap-2"><Sparkles className="h-3.5 w-3.5" /> {t.quietSpace}</div>
+              </div>
+
+              <div className="timeline-banner relative mb-6 overflow-hidden rounded-[26px] border border-[#dbe5d7] bg-[#e7eee2] p-5 sm:p-6">
+                <div className="absolute -end-8 -top-14 h-40 w-40 rounded-full border border-[#c6d7c0] opacity-60" /><div className="absolute -end-2 -top-8 h-28 w-28 rounded-full border border-[#c6d7c0] opacity-60" />
+                <div className="relative flex items-start gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f8faf5] text-[#6b7f5a] shadow-sm"><Languages className="h-5 w-5" /></div>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2"><h2 className="text-sm font-bold text-[#4c6548]">{t.timeline}</h2><span className="rounded-full bg-[#d2e0cc] px-2 py-0.5 text-[10px] font-bold text-[#698163]">01</span></div>
+                    <p className="mt-1 max-w-xl text-xs leading-5 text-[#728570]">{t.timelineDesc}</p>
+                  </div>
+                  <CheckCircle2 className="ms-auto hidden h-5 w-5 shrink-0 text-[#73916b] sm:block" />
+                </div>
+              </div>
+
+              <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-4 shadow-[0_5px_24px_rgba(68,80,69,0.035)] sm:p-5">
+                <div className="flex gap-3">
+                  <Avatar className="h-10 w-10 shrink-0"><AvatarFallback className="bg-[#eadfd4] font-semibold text-[#886d53]">ل</AvatarFallback></Avatar>
+                  <div className="min-w-0 flex-1">
+                    <textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={t.writePlaceholder} className="min-h-[62px] w-full resize-none border-0 bg-transparent pt-1 text-sm leading-6 text-[#3d4b43] outline-none placeholder:text-[#a4ada6]" />
+                    <div className="flex items-center justify-between border-t border-[#edf0ea] pt-3">
+                      <div className="flex items-center gap-2 text-xs text-[#93a096]"><button className="rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]"><Plus className="h-4 w-4" /></button><span>{t.publicCircle}</span></div>
+                      <Button onClick={publish} size="sm" className="rounded-xl bg-[#6b7f5a] px-4 text-xs font-semibold text-white shadow-[0_5px_12px_rgba(107,127,90,0.18)] hover:bg-[#587047]">{t.publish}<Send className="h-3.5 w-3.5" /></Button>
+                    </div>
+                  </div>
+                </div>
+                {posted && <div className="mt-3 flex items-center gap-2 rounded-xl bg-[#edf5e9] px-3 py-2 text-xs font-semibold text-[#5d7955]"><CheckCircle2 className="h-4 w-4" /> {t.published}</div>}
+              </div>
+
+              <div className="mt-7 flex flex-wrap items-center gap-2 border-b border-[#e3e6df] pb-3">
+                {(["all", "circles", "topics"] as const).map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${activeTab === tab ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-white"}`}>{tab === "all" ? t.allFollowing : tab === "circles" ? t.myCircles : t.myTopics}</button>)}
+                <div className="ms-auto flex items-center gap-1 text-[11px] text-[#9aa49b]"><span className="h-1.5 w-1.5 rounded-full bg-[#7f9a73]" /> {visiblePosts.length} {t.newLabel.toLowerCase()}</div>
+              </div>
+
+              <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1">
+                {["الكل", ...topics].map((topic) => <button key={topic} onClick={() => setActiveTopic(topic)} className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition ${activeTopic === topic ? "border-[#b8cbb1] bg-[#eaf1e7] text-[#587152]" : "border-[#e3e7df] bg-[#fafbf8] text-[#89958b] hover:border-[#cbd9c7]"}`}>{topic}</button>)}
+              </div>
+
+              <div className="mt-4 space-y-4">
+                {visiblePosts.map((post) => {
+                  const isLiked = liked.includes(post.id);
+                  const isSaved = saved.includes(post.id);
+                  return <article key={post.id} className="post-card rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)] sm:p-6">
+                    <div className="flex items-start gap-3">
+                      <Avatar className={`h-10 w-10 shrink-0 ${post.tone}`}><AvatarFallback className={post.tone}>{post.initials}</AvatarFallback></Avatar>
+                      <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-sm font-bold text-[#3d4b43]">{post.author}</span><span className="text-xs text-[#9aa59c]">@{post.handle}</span><span className="text-[#b3bcb4]">·</span><span className="text-xs text-[#9aa59c]">{post.time} {t.minutes}</span></div><div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#89978c]"><span className="rounded-full bg-[#eef2eb] px-2 py-0.5 text-[#6f806d]">{post.circle}</span><span>·</span><span>{post.topic}</span></div></div>
+                      <button aria-label="More" className="rounded-lg p-1 text-[#a4ada5] hover:bg-[#f0f2ed] hover:text-[#607260]"><MoreHorizontal className="h-4 w-4" /></button>
+                    </div>
+                    <p className="mt-5 text-[15px] leading-8 text-[#4d5b52]">{post.body[locale]}</p>
+                    <div className="mt-5 flex items-center gap-1 border-t border-[#edf0ea] pt-3 text-xs text-[#9aa59d]">
+                      <button onClick={() => toggleLike(post.id)} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#f6eae5] ${isLiked ? "text-[#bd755e]" : "hover:text-[#b86e57]"}`}><Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />{isLiked ? t.liked : t.like}{isLiked && <span>{post.likes + 1}</span>}</button>
+                      <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</button>
+                      <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><ArrowUpLeft className="h-4 w-4" />{t.share}</button>
+                      <button onClick={() => toggleSaved(post.id)} className={`ms-auto rounded-lg p-2 transition hover:bg-[#edf3e9] ${isSaved ? "text-[#6b7f5a]" : "text-[#9aa59d] hover:text-[#66805c]"}`} aria-label={isSaved ? t.saved : t.save}><Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} /></button>
+                    </div>
+                  </article>;
+                })}
+              </div>
+
+              <div className="mt-6 flex flex-col items-center rounded-[26px] border border-dashed border-[#cbd8c5] bg-[#f0f5ed] px-6 py-8 text-center">
+                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#e1ecdc] text-[#6b875f]"><Leaf className="h-5 w-5" /></div>
+                <h3 className="text-sm font-bold text-[#526b4d]">{t.noMore}</h3><p className="mt-1 max-w-xs text-xs leading-5 text-[#82927e]">{t.noMoreDesc}</p>
+              </div>
+            </section>
+
+            <aside className="hidden space-y-5 xl:block">
+              <div className="sticky top-6 space-y-5">
+                <div className="mindful-card overflow-hidden rounded-[26px] border border-[#e1d8c9] bg-[#f4ede3] p-5">
+                  <div className="mb-8 flex items-start justify-between"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fffaf2] text-[#ad8862]"><Leaf className="h-5 w-5" /></div><span className="rounded-full bg-[#eadfce] px-2.5 py-1 text-[10px] font-bold text-[#997753]">02 / 03</span></div>
+                  <h2 className="font-display text-[25px] font-semibold leading-tight tracking-[-0.04em] text-[#6d5946]">{t.mindful}</h2><p className="mt-2 text-xs leading-5 text-[#947e66]">{t.mindfulDesc}</p>
+                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#e3d6c3]"><div className="h-full w-2/3 rounded-full bg-[#b99670]" /></div>
+                </div>
+
+                <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
+                  <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-bold text-[#536258]">{t.circlesTitle}</h2><button className="text-xs font-semibold text-[#78906f] hover:text-[#4e6a48]">{t.seeAll}</button></div>
+                  <div className="space-y-3">
+                    {[{ name: "العائلة والأصدقاء", icon: "ع", tone: "bg-[#e8dfd5] text-[#8a6d52]" }, { name: "المعارف والعمل", icon: "م", tone: "bg-[#dce7df] text-[#5b7965]" }, { name: "عام", icon: "ع", tone: "bg-[#e0e5eb] text-[#647388]" }].map((circle) => <div key={circle.name} className="flex items-center gap-3"><div className={`flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold ${circle.tone}`}>{circle.icon}</div><span className="text-xs font-medium text-[#718077]">{circle.name}</span><span className="ms-auto h-1.5 w-1.5 rounded-full bg-[#a9b9a3]" /></div>)}
+                  </div>
+                </div>
+
+                <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
+                  <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-bold text-[#536258]">{t.topicsTitle}</h2><Compass className="h-4 w-4 text-[#93a394]" /></div>
+                  <div className="flex flex-wrap gap-2">{topics.map((topic) => { const isFollowed = followedTopics.includes(topic); return <button key={topic} onClick={() => toggleTopic(topic)} className={`rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition ${isFollowed ? "border-[#d1dfcc] bg-[#edf3e9] text-[#63805d]" : "border-[#e6e8e2] text-[#97a29a] hover:border-[#cad9c6]"}`}>{isFollowed ? "✓ " : "+ "}{topic}</button>; })}</div>
+                </div>
+
+                <div className="flex items-center gap-2 px-2 text-[10px] leading-5 text-[#a0aaa1]"><ShieldCheck className="h-4 w-4 shrink-0 text-[#8da083]" /> {t.noNumbers}. {t.quietSpace}.</div>
+              </div>
+            </aside>
+          </div>
+        </main>
       </div>
-      <MadeWithDyad />
     </div>
   );
 };

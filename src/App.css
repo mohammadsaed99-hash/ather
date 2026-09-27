@@ -1,42 +1,72 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: "DM Sans", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  color: #28342f;
+  background: #f5f3ee;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+* { box-sizing: border-box; }
+
+body { margin: 0; min-width: 320px; }
+button, textarea { font: inherit; }
+button { cursor: pointer; }
+
+.font-display { font-family: "Noto Sans Arabic", "DM Sans", ui-sans-serif, sans-serif; }
+
+.athar-app { min-height: 100vh; }
+
+.brand-mark { position: relative; }
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 1px solid rgba(107, 127, 90, .18);
+  border-radius: 21px;
+  transform: rotate(8deg);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.timeline-banner::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: 24%;
+  bottom: -50px;
+  height: 110px;
+  width: 110px;
+  border: 1px solid rgba(134, 159, 125, .2);
+  border-radius: 999px;
 }
+
+.mindful-card { position: relative; }
+.mindful-card::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -35px;
+  bottom: -50px;
+  height: 160px;
+  width: 160px;
+  border: 1px solid rgba(185, 150, 112, .18);
+  border-radius: 999px;
+}
+
+.post-card, .nav-item, .mindful-card { will-change: transform; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+  .post-card { animation: rise-in .45s ease both; }
+  .post-card:nth-child(2) { animation-delay: .06s; }
+  .post-card:nth-child(3) { animation-delay: .12s; }
 }
 
-.card {
-  padding: 2em;
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.read-the-docs {
-  color: #888;
+@media (max-width: 640px) {
+  .athar-app { overflow-x: hidden; }
 }
