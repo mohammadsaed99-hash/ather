@@ -16,23 +16,27 @@ import {
   Home,
   Leaf,
   Languages,
+  MapPin,
+  Megaphone,
   MessageCircle,
   MoreHorizontal,
+  Navigation,
   Plus,
   Search,
   Send,
   Settings2,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   UsersRound,
 } from "lucide-react";
 import "../App.css";
 
 type Locale = "ar" | "en" | "fr" | "zh" | "es" | "hi";
-type NavKey = "home" | "explore" | "circles" | "saved";
+type NavKey = "home" | "explore" | "circles" | "saved" | "ads";
 
 type Copy = {
-  nav: { home: string; explore: string; circles: string; saved: string };
+  nav: { home: string; explore: string; circles: string; saved: string; ads: string };
   greeting: string;
   title: string;
   subtitle: string;
@@ -70,11 +74,24 @@ type Copy = {
   noNumbers: string;
   publicCircle: string;
   quietSpace: string;
+  adsTitle: string;
+  adsSubtitle: string;
+  adCategories: string;
+  allAds: string;
+  location: string;
+  useLocation: string;
+  locating: string;
+  locationReady: string;
+  locationDenied: string;
+  nearby: string;
+  sponsored: string;
+  noAds: string;
+  privacyNote: string;
 };
 
 const copy: Record<Locale, Copy> = {
   ar: {
-    nav: { home: "الرئيسية", explore: "اكتشف", circles: "دوائري", saved: "المحفوظات" },
+    nav: { home: "الرئيسية", explore: "اكتشف", circles: "دوائري", saved: "المحفوظات", ads: "الإعلانات" },
     greeting: "صباح هادئ، ليان",
     title: "مساحتك الهادئة",
     subtitle: "كل ما تراه هنا اختاره وقتك، لا خوارزمية.",
@@ -112,9 +129,22 @@ const copy: Record<Locale, Copy> = {
     noNumbers: "بلا أرقام للمتابعين",
     publicCircle: "عام",
     quietSpace: "هدوء مقصود",
+    adsTitle: "سوق أَثَر",
+    adsSubtitle: "إعلانات هادئة منفصلة عن التايم لاين، مرتبة حسب اهتماماتك وموقعك.",
+    adCategories: "فئات الإعلانات",
+    allAds: "الكل",
+    location: "الموقع الجغرافي",
+    useLocation: "استخدم موقع المتصفح",
+    locating: "جارٍ تحديد موقعك…",
+    locationReady: "تم تخصيص النتائج لموقعك",
+    locationDenied: "لم يتم السماح بالموقع؛ نعرض نتائج عامة.",
+    nearby: "قريب منك",
+    sponsored: "إعلان مختار",
+    noAds: "لا توجد إعلانات في هذه الفئة الآن.",
+    privacyNote: "يُستخدم الموقع على جهازك لترتيب النتائج ولا نحتفظ بإحداثياتك.",
   },
   en: {
-    nav: { home: "Home", explore: "Explore", circles: "Circles", saved: "Saved" },
+    nav: { home: "Home", explore: "Explore", circles: "Circles", saved: "Saved", ads: "Ads" },
     greeting: "A quiet morning, Layan",
     title: "Your quiet space",
     subtitle: "Everything here arrives by time, never by an algorithm.",
@@ -152,9 +182,22 @@ const copy: Record<Locale, Copy> = {
     noNumbers: "No follower counts",
     publicCircle: "Public",
     quietSpace: "Intentional quiet",
+    adsTitle: "Athar marketplace",
+    adsSubtitle: "Quiet ads, separate from your timeline, shaped by your interests and location.",
+    adCategories: "Ad categories",
+    allAds: "All",
+    location: "Location",
+    useLocation: "Use browser location",
+    locating: "Finding your location…",
+    locationReady: "Results tailored to your location",
+    locationDenied: "Location was not shared; showing general results.",
+    nearby: "Near you",
+    sponsored: "Curated ad",
+    noAds: "No ads in this category right now.",
+    privacyNote: "Your location stays on this device and is only used to sort results.",
   },
   fr: {
-    nav: { home: "Accueil", explore: "Découvrir", circles: "Cercles", saved: "Enregistrés" },
+    nav: { home: "Accueil", explore: "Découvrir", circles: "Cercles", saved: "Enregistrés", ads: "Annonces" },
     greeting: "Un matin calme, Layan",
     title: "Votre espace calme",
     subtitle: "Tout arrive ici par le temps, jamais par un algorithme.",
@@ -192,9 +235,22 @@ const copy: Record<Locale, Copy> = {
     noNumbers: "Sans compteurs d'abonnés",
     publicCircle: "Public",
     quietSpace: "Calme choisi",
+    adsTitle: "Marché Athar",
+    adsSubtitle: "Des annonces calmes, séparées de votre fil, selon vos intérêts et votre lieu.",
+    adCategories: "Catégories",
+    allAds: "Tout",
+    location: "Lieu",
+    useLocation: "Utiliser le lieu du navigateur",
+    locating: "Localisation en cours…",
+    locationReady: "Résultats adaptés à votre lieu",
+    locationDenied: "Lieu non partagé ; résultats généraux affichés.",
+    nearby: "Près de vous",
+    sponsored: "Annonce choisie",
+    noAds: "Aucune annonce dans cette catégorie pour le moment.",
+    privacyNote: "Votre lieu reste sur cet appareil et sert uniquement à trier les résultats.",
   },
   zh: {
-    nav: { home: "首页", explore: "探索", circles: "圈子", saved: "收藏" },
+    nav: { home: "首页", explore: "探索", circles: "圈子", saved: "收藏", ads: "广告" },
     greeting: "早安，Layan",
     title: "你的宁静空间",
     subtitle: "这里的一切按时间到来，从不由算法决定。",
@@ -232,9 +288,22 @@ const copy: Record<Locale, Copy> = {
     noNumbers: "不显示关注者数量",
     publicCircle: "公开",
     quietSpace: "有意识的宁静",
+    adsTitle: "Athar 市集",
+    adsSubtitle: "独立于时间线的宁静广告，按你的兴趣和位置排列。",
+    adCategories: "广告分类",
+    allAds: "全部",
+    location: "位置",
+    useLocation: "使用浏览器位置",
+    locating: "正在查找位置…",
+    locationReady: "已按你的位置定制结果",
+    locationDenied: "未分享位置；显示通用结果。",
+    nearby: "你附近",
+    sponsored: "精选广告",
+    noAds: "此分类暂时没有广告。",
+    privacyNote: "位置留在此设备上，仅用于排列结果。",
   },
   es: {
-    nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados" },
+    nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados", ads: "Anuncios" },
     greeting: "Una mañana tranquila, Layan",
     title: "Tu espacio tranquilo",
     subtitle: "Todo llega aquí por el tiempo, nunca por un algoritmo.",
@@ -272,9 +341,22 @@ const copy: Record<Locale, Copy> = {
     noNumbers: "Sin números de seguidores",
     publicCircle: "Público",
     quietSpace: "Calma intencional",
+    adsTitle: "Mercado de Athar",
+    adsSubtitle: "Anuncios tranquilos, separados de tu timeline y ordenados por tus intereses y ubicación.",
+    adCategories: "Categorías",
+    allAds: "Todo",
+    location: "Ubicación",
+    useLocation: "Usar ubicación del navegador",
+    locating: "Buscando tu ubicación…",
+    locationReady: "Resultados adaptados a tu ubicación",
+    locationDenied: "No compartiste la ubicación; mostramos resultados generales.",
+    nearby: "Cerca de ti",
+    sponsored: "Anuncio seleccionado",
+    noAds: "No hay anuncios en esta categoría ahora.",
+    privacyNote: "Tu ubicación permanece en este dispositivo y solo ordena los resultados.",
   },
   hi: {
-    nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए" },
+    nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए", ads: "विज्ञापन" },
     greeting: "शांत सुबह, Layan",
     title: "आपकी शांत जगह",
     subtitle: "यहाँ सब कुछ समय के अनुसार आता है, एल्गोरिदम के अनुसार नहीं।",
@@ -312,6 +394,19 @@ const copy: Record<Locale, Copy> = {
     noNumbers: "फ़ॉलोअर संख्या नहीं",
     publicCircle: "सार्वजनिक",
     quietSpace: "सोची-समझी शांति",
+    adsTitle: "Athar बाज़ार",
+    adsSubtitle: "आपकी टाइमलाइन से अलग शांत विज्ञापन, आपकी रुचि और स्थान के अनुसार।",
+    adCategories: "विज्ञापन श्रेणियाँ",
+    allAds: "सभी",
+    location: "स्थान",
+    useLocation: "ब्राउज़र स्थान का उपयोग करें",
+    locating: "स्थान खोज रहे हैं…",
+    locationReady: "आपके स्थान के अनुसार परिणाम",
+    locationDenied: "स्थान साझा नहीं किया; सामान्य परिणाम दिखा रहे हैं।",
+    nearby: "आपके पास",
+    sponsored: "चुना हुआ विज्ञापन",
+    noAds: "इस श्रेणी में अभी कोई विज्ञापन नहीं है।",
+    privacyNote: "आपका स्थान इसी डिवाइस पर रहता है और केवल परिणाम क्रम के लिए उपयोग होता है।",
   },
 };
 
@@ -389,12 +484,141 @@ const posts = [
   },
 ];
 
+type AdCategoryKey = "all" | "learning" | "home" | "wellness" | "tech";
+
+type AdItem = {
+  id: number;
+  brand: string;
+  category: Exclude<AdCategoryKey, "all">;
+  place: string;
+  local: boolean;
+  tone: string;
+  title: Record<Locale, string>;
+  description: Record<Locale, string>;
+};
+
+const adCategories: { key: AdCategoryKey; label: Record<Locale, string> }[] = [
+  { key: "all", label: { ar: "الكل", en: "All", fr: "Tout", zh: "全部", es: "Todo", hi: "सभी" } },
+  { key: "learning", label: { ar: "تعلم", en: "Learning", fr: "Apprendre", zh: "学习", es: "Aprendizaje", hi: "सीखना" } },
+  { key: "home", label: { ar: "منزل", en: "Home", fr: "Maison", zh: "居家", es: "Hogar", hi: "घर" } },
+  { key: "wellness", label: { ar: "عافية", en: "Wellness", fr: "Bien-être", zh: "身心", es: "Bienestar", hi: "कल्याण" } },
+  { key: "tech", label: { ar: "تقنية", en: "Technology", fr: "Technologie", zh: "科技", es: "Tecnología", hi: "तकनीक" } },
+];
+
+const ads: AdItem[] = [
+  {
+    id: 1,
+    brand: "بيت الورق",
+    category: "learning",
+    place: "الرياض · حي الملقا",
+    local: true,
+    tone: "bg-[#e5eadb] text-[#607651]",
+    title: { ar: "نادي قراءة صغير، أثر كبير", en: "A small reading club, a lasting trace", fr: "Un petit club de lecture, une grande trace", zh: "小小读书会，留下长久痕迹", es: "Un pequeño club de lectura, una gran huella", hi: "छोटा रीडिंग क्लब, गहरी छाप" },
+    description: { ar: "لقاءات أسبوعية هادئة لعشاق الكتب، دون سباق أو ضجيج.", en: "Quiet weekly gatherings for readers, with no rush and no noise.", fr: "Des rencontres hebdomadaires pour lecteurs, sans course ni bruit.", zh: "为爱书人准备的安静周聚，没有匆忙，也没有喧嚣。", es: "Encuentros semanales tranquilos para lectores, sin prisa ni ruido.", hi: "पाठकों के लिए शांत साप्ताहिक मिलन, बिना जल्दबाज़ी और शोर के।" },
+  },
+  {
+    id: 2,
+    brand: "سُكنى",
+    category: "home",
+    place: "جدة · الروضة",
+    local: false,
+    tone: "bg-[#eee3d5] text-[#8c6b4b]",
+    title: { ar: "أشياء تعيش معك طويلاً", en: "Objects made to stay with you", fr: "Des objets qui restent avec vous", zh: "陪你长久生活的物件", es: "Objetos hechos para acompañarte", hi: "आपके साथ लंबे समय तक रहने वाली चीज़ें" },
+    description: { ar: "أثاث وأدوات منزلية بسيطة، مصممة بعناية لاستهلاك أهدأ.", en: "Simple home goods, carefully made for a slower kind of consumption.", fr: "Des objets simples, conçus avec soin pour consommer plus doucement.", zh: "精心设计的简约家居用品，让消费更从容。", es: "Objetos sencillos para el hogar, hechos para consumir con más calma.", hi: "धीमे और सचेत उपभोग के लिए सावधानी से बने सरल घरेलू सामान।" },
+  },
+  {
+    id: 3,
+    brand: "مسافة",
+    category: "wellness",
+    place: "الدمام · الشاطئ",
+    local: true,
+    tone: "bg-[#dce7e7] text-[#557579]",
+    title: { ar: "استراحة من الشاشة", en: "A pause away from the screen", fr: "Une pause loin de l'écran", zh: "离开屏幕的片刻", es: "Una pausa lejos de la pantalla", hi: "स्क्रीन से दूर एक विराम" },
+    description: { ar: "جلسات تنفس ومشي بطيء في الهواء الطلق، بحجز بسيط ووقت واضح.", en: "Breathing and slow-walk sessions outdoors, with simple booking and clear time.", fr: "Des séances de respiration et de marche lente en plein air.", zh: "户外呼吸与慢走课程，预约简单，时间清晰。", es: "Sesiones de respiración y caminata lenta al aire libre.", hi: "खुले वातावरण में साँस और धीमी चाल के सत्र, सरल बुकिंग के साथ।" },
+  },
+  {
+    id: 4,
+    brand: "نقطة",
+    category: "tech",
+    place: "عن بُعد · عالمي",
+    local: false,
+    tone: "bg-[#e3e0eb] text-[#706487]",
+    title: { ar: "أدوات رقمية بلا تشتيت", en: "Digital tools without distraction", fr: "Des outils numériques sans distraction", zh: "不打扰你的数字工具", es: "Herramientas digitales sin distracciones", hi: "बिना ध्यान भटकाए डिजिटल टूल" },
+    description: { ar: "تطبيقات وأدوات تساعدك على إنجاز شيء واحد في كل مرة.", en: "Apps and tools that help you do one thing at a time.", fr: "Des outils pour faire une seule chose à la fois.", zh: "帮助你一次专注完成一件事的应用和工具。", es: "Apps y herramientas para hacer una sola cosa a la vez.", hi: "एक समय में एक काम करने में मदद करने वाले ऐप और टूल।" },
+  },
+];
+
 const navItems: { key: NavKey; icon: typeof Home }[] = [
   { key: "home", icon: Home },
   { key: "explore", icon: Compass },
   { key: "circles", icon: UsersRound },
   { key: "saved", icon: Bookmark },
+  { key: "ads", icon: Megaphone },
 ];
+
+const AdsPanel = ({ locale, t }: { locale: Locale; t: Copy }) => {
+  const [category, setCategory] = useState<AdCategoryKey>("all");
+  const [locationStatus, setLocationStatus] = useState<"idle" | "loading" | "enabled" | "denied">("idle");
+  const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  const visibleAds = useMemo(() => {
+    const matching = category === "all" ? ads : ads.filter((ad) => ad.category === category);
+    return locationStatus === "enabled" ? [...matching].sort((first, second) => Number(second.local) - Number(first.local)) : matching;
+  }, [category, locationStatus]);
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus("denied");
+      return;
+    }
+    setLocationStatus("loading");
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setCoordinates({ latitude: coords.latitude, longitude: coords.longitude });
+        setLocationStatus("enabled");
+      },
+      () => setLocationStatus("denied"),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
+    );
+  };
+
+  return (
+    <section className="mx-auto max-w-[1030px]">
+      <div className="mb-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div>
+          <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-[#78906f]"><Megaphone className="h-4 w-4" /> {t.sponsored}</div>
+          <h1 className="font-display text-[clamp(2.2rem,5vw,3.45rem)] font-semibold leading-[1.08] tracking-[-0.055em] text-[#2e3b34]">{t.adsTitle}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#859189]">{t.adsSubtitle}</p>
+        </div>
+        <div className="flex items-center gap-2 self-start rounded-2xl border border-[#dfe7db] bg-[#f8faf5] px-3 py-2 text-xs text-[#6d806c] sm:self-auto">
+          <MapPin className="h-4 w-4" />
+          <span>{locationStatus === "enabled" ? t.locationReady : t.location}</span>
+        </div>
+      </div>
+
+      <div className="mb-6 rounded-[26px] border border-[#dbe5d7] bg-[#e7eee2] p-4 sm:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f8faf5] text-[#6b7f5a]"><SlidersHorizontal className="h-5 w-5" /></div><div><p className="text-sm font-bold text-[#4c6548]">{t.adCategories}</p><p className="mt-0.5 text-xs text-[#728570]">{t.adsSubtitle}</p></div></div>
+          <div className="flex flex-wrap gap-2">{adCategories.map((item) => <button key={item.key} onClick={() => setCategory(item.key)} className={`rounded-xl border px-3 py-2 text-xs font-semibold transition ${category === item.key ? "border-[#b8cbb1] bg-[#f8faf5] text-[#506c4a] shadow-sm" : "border-transparent text-[#7b8c7b] hover:border-[#cad9c7] hover:bg-[#f1f6ee]"}`}>{item.label[locale]}</button>)}</div>
+        </div>
+      </div>
+
+      <div className="mb-6 flex flex-col justify-between gap-3 rounded-[22px] border border-[#e2e5dc] bg-[#fbfaf7] p-4 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 items-center gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#edf3e9] text-[#6b7f5a]"><Navigation className="h-4 w-4" /></div><div className="min-w-0"><p className="text-sm font-semibold text-[#536258]">{t.location}</p><p className="mt-0.5 truncate text-xs text-[#8c998f]">{locationStatus === "loading" ? t.locating : locationStatus === "enabled" && coordinates ? `${t.locationReady} · ${coordinates.latitude.toFixed(2)}, ${coordinates.longitude.toFixed(2)}` : locationStatus === "denied" ? t.locationDenied : t.privacyNote}</p></div></div>
+        <Button onClick={requestLocation} disabled={locationStatus === "loading"} variant="outline" size="sm" className="shrink-0 rounded-xl border-[#d5e0d1] bg-[#f8faf5] text-xs font-semibold text-[#5f7859] hover:bg-[#edf3e9]">{locationStatus === "loading" ? t.locating : locationStatus === "enabled" ? t.locationReady : t.useLocation}<MapPin className="h-3.5 w-3.5" /></Button>
+      </div>
+
+      {visibleAds.length > 0 ? <div className="grid gap-4 md:grid-cols-2">{visibleAds.map((ad) => <article key={ad.id} className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)]">
+        <div className="mb-7 flex items-start justify-between"><div className={`flex h-12 w-12 items-center justify-center rounded-2xl text-lg font-bold ${ad.tone}`}>{ad.brand.slice(0, 1)}</div><span className="rounded-full bg-[#f0f2ed] px-2.5 py-1 text-[10px] font-semibold text-[#88958b]">{t.sponsored}</span></div>
+        <div className="flex items-center gap-2 text-[11px] font-semibold text-[#7f8f81]"><span>{ad.brand}</span><span>·</span><span>{ad.place}</span>{locationStatus === "enabled" && ad.local && <span className="rounded-full bg-[#eaf2e6] px-2 py-0.5 text-[#68805f]">{t.nearby}</span>}</div>
+        <h2 className="mt-4 font-display text-xl font-semibold leading-snug tracking-[-0.025em] text-[#3a4b40]">{ad.title[locale]}</h2><p className="mt-2 min-h-[48px] text-sm leading-6 text-[#7b887e]">{ad.description[locale]}</p>
+        <button className="mt-5 flex w-full items-center justify-between rounded-xl bg-[#edf3e9] px-4 py-3 text-xs font-bold text-[#587152] transition hover:bg-[#e2ecdf]"><span>{locale === "ar" ? "اكتشف بهدوء" : locale === "fr" ? "Découvrir doucement" : locale === "zh" ? "安静探索" : locale === "es" ? "Descubrir con calma" : locale === "hi" ? "शांति से देखें" : "Explore quietly"}</span><ArrowUpLeft className="h-4 w-4" /></button>
+      </article>)}</div> : <div className="rounded-[26px] border border-dashed border-[#cbd8c5] bg-[#f0f5ed] px-6 py-14 text-center"><Leaf className="mx-auto mb-3 h-6 w-6 text-[#6b875f]" /><p className="text-sm font-semibold text-[#526b4d]">{t.noAds}</p></div>}
+
+      <div className="mt-6 flex items-center gap-2 px-2 text-[11px] leading-5 text-[#99a49b]"><ShieldCheck className="h-4 w-4 shrink-0 text-[#8da083]" /> {t.privacyNote}</div>
+    </section>
+  );
+};
 
 const Index = () => {
   const [locale, setLocale] = useState<Locale>("ar");
@@ -488,8 +712,9 @@ const Index = () => {
             <div className="flex items-center gap-3 lg:hidden">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#6b7f5a] text-white"><Feather className="h-5 w-5" /></div>
               <span className="font-display text-2xl font-semibold">أَثَر</span>
+              <button onClick={() => setActiveNav("ads")} aria-label={t.nav.ads} className={`ms-2 rounded-xl p-2 ${activeNav === "ads" ? "bg-[#e4ebdf] text-[#48623f]" : "text-[#849087]"}`}><Megaphone className="h-4 w-4" /></button>
             </div>
-            <div className="hidden items-center gap-2 text-xs font-medium text-[#849087] lg:flex"><span className="h-2 w-2 rounded-full bg-[#87a174]" /> {t.timeline}</div>
+            <div className="hidden items-center gap-2 text-xs font-medium text-[#849087] lg:flex"><span className={`h-2 w-2 rounded-full ${activeNav === "ads" ? "bg-[#b99670]" : "bg-[#87a174]"}`} /> {activeNav === "ads" ? t.adsTitle : t.timeline}</div>
             <div className="ms-auto flex items-center gap-2 sm:gap-3">
               <button className="hidden items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-[#809087] transition hover:bg-white sm:flex"><Search className="h-4 w-4" />{t.search}</button>
               <div className="relative">
@@ -512,7 +737,7 @@ const Index = () => {
             </div>
           </header>
 
-          <div className="mx-auto grid max-w-[1030px] gap-7 xl:grid-cols-[minmax(0,1fr)_286px]">
+          {activeNav === "ads" ? <AdsPanel locale={locale} t={t} /> : <div className="mx-auto grid max-w-[1030px] gap-7 xl:grid-cols-[minmax(0,1fr)_286px]">
             <section className="min-w-0">
               <div className="mb-6 flex items-end justify-between gap-4">
                 <div>
@@ -608,7 +833,7 @@ const Index = () => {
                 <div className="flex items-center gap-2 px-2 text-[10px] leading-5 text-[#a0aaa1]"><ShieldCheck className="h-4 w-4 shrink-0 text-[#8da083]" /> {t.noNumbers}. {t.quietSpace}.</div>
               </div>
             </aside>
-          </div>
+          </div>}
         </main>
       </div>
     </div>
