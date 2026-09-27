@@ -15,7 +15,6 @@ import {
   Feather,
   Flag,
   Globe2,
-  Heart,
   Home,
   Leaf,
   Languages,
@@ -99,6 +98,15 @@ type Copy = {
   sensitiveNotice: string;
   showSensitive: string;
   hideSensitive: string;
+  insightful: string;
+  insightfulDone: string;
+  privateCircle: string;
+  publicTopic: string;
+  qualityGate: string;
+  qualityGateDesc: string;
+  qualityError: string;
+  topicLabel: string;
+  meaningfulOnly: string;
 };
 
 const copy: Record<Locale, Copy> = {
@@ -162,6 +170,15 @@ const copy: Record<Locale, Copy> = {
     sensitiveNotice: "صورة تحتوي على مشاهد استعراضية",
     showSensitive: "عرض الصورة بوعي",
     hideSensitive: "إخفاء الصورة",
+    insightful: "أَثَر فيّ",
+    insightfulDone: "ترك أثراً فيّ",
+    privateCircle: "دائرة خاصة",
+    publicTopic: "موضوع عام",
+    qualityGate: "حارس جودة الموضوع",
+    qualityGateDesc: "المواضيع العامة للنصوص العميقة والتجارب الحقيقية فقط.",
+    qualityError: "أضف قيمة واضحة قبل النشر العام: فكرة، تجربة، أو تفاصيل مفيدة.",
+    topicLabel: "الموضوع",
+    meaningfulOnly: "نشر ذو معنى فقط",
   },
   en: {
     nav: { home: "Home", explore: "Explore", circles: "Circles", saved: "Saved", ads: "Ads" },
@@ -223,6 +240,15 @@ const copy: Record<Locale, Copy> = {
     sensitiveNotice: "Image contains suggestive scenes",
     showSensitive: "Show mindfully",
     hideSensitive: "Hide image",
+    insightful: "It moved me",
+    insightfulDone: "It left a trace",
+    privateCircle: "Private circle",
+    publicTopic: "Public topic",
+    qualityGate: "Topic quality gate",
+    qualityGateDesc: "Public topics are for thoughtful writing, real experiences, and useful details.",
+    qualityError: "Add clear value before posting publicly: an idea, experience, or useful detail.",
+    topicLabel: "Topic",
+    meaningfulOnly: "Meaningful posts only",
   },
   fr: {
     nav: { home: "Accueil", explore: "Découvrir", circles: "Cercles", saved: "Enregistrés", ads: "Annonces" },
@@ -284,6 +310,15 @@ const copy: Record<Locale, Copy> = {
     sensitiveNotice: "Cette image contient des scènes suggestives",
     showSensitive: "Afficher consciemment",
     hideSensitive: "Masquer l'image",
+    insightful: "Cela m'a touché",
+    insightfulDone: "Une trace laissée",
+    privateCircle: "Cercle privé",
+    publicTopic: "Sujet public",
+    qualityGate: "Gardien de qualité",
+    qualityGateDesc: "Les sujets publics accueillent les idées profondes, les expériences et les détails utiles.",
+    qualityError: "Ajoutez une vraie valeur avant de publier : une idée, une expérience ou un détail utile.",
+    topicLabel: "Sujet",
+    meaningfulOnly: "Publications porteuses de sens",
   },
   zh: {
     nav: { home: "首页", explore: "探索", circles: "圈子", saved: "收藏", ads: "广告" },
@@ -345,6 +380,15 @@ const copy: Record<Locale, Copy> = {
     sensitiveNotice: "图片包含具有暗示性的场景",
     showSensitive: "谨慎查看",
     hideSensitive: "隐藏图片",
+    insightful: "触动了我",
+    insightfulDone: "留下了痕迹",
+    privateCircle: "私人圈子",
+    publicTopic: "公共主题",
+    qualityGate: "主题质量守门人",
+    qualityGateDesc: "公共主题只接纳有深度的想法、真实经历和有用细节。",
+    qualityError: "公开发布前请补充明确价值：想法、经历或有用细节。",
+    topicLabel: "主题",
+    meaningfulOnly: "只发布有意义的内容",
   },
   es: {
     nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados", ads: "Anuncios" },
@@ -406,6 +450,15 @@ const copy: Record<Locale, Copy> = {
     sensitiveNotice: "La imagen contiene escenas sugerentes",
     showSensitive: "Ver con intención",
     hideSensitive: "Ocultar imagen",
+    insightful: "Me dejó algo",
+    insightfulDone: "Dejó una huella",
+    privateCircle: "Círculo privado",
+    publicTopic: "Tema público",
+    qualityGate: "Guardia de calidad",
+    qualityGateDesc: "Los temas públicos son para ideas profundas, experiencias reales y detalles útiles.",
+    qualityError: "Añade valor claro antes de publicar: una idea, experiencia o detalle útil.",
+    topicLabel: "Tema",
+    meaningfulOnly: "Solo contenido con sentido",
   },
   hi: {
     nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए", ads: "विज्ञापन" },
@@ -467,6 +520,15 @@ const copy: Record<Locale, Copy> = {
     sensitiveNotice: "इस तस्वीर में उत्तेजक दृश्य हैं",
     showSensitive: "सचेत होकर देखें",
     hideSensitive: "तस्वीर छिपाएँ",
+    insightful: "इसने मुझे छुआ",
+    insightfulDone: "एक छाप छोड़ी",
+    privateCircle: "निजी सर्कल",
+    publicTopic: "सार्वजनिक विषय",
+    qualityGate: "विषय गुणवत्ता द्वार",
+    qualityGateDesc: "सार्वजनिक विषय गहरे विचार, वास्तविक अनुभव और उपयोगी विवरणों के लिए हैं।",
+    qualityError: "सार्वजनिक पोस्ट से पहले स्पष्ट मूल्य जोड़ें: विचार, अनुभव या उपयोगी विवरण।",
+    topicLabel: "विषय",
+    meaningfulOnly: "सिर्फ़ अर्थपूर्ण पोस्ट",
   },
 };
 
@@ -714,9 +776,12 @@ const Index = () => {
   const [activeNav, setActiveNav] = useState<NavKey>("home");
   const [activeTab, setActiveTab] = useState<"all" | "circles" | "topics">("all");
   const [activeTopic, setActiveTopic] = useState("الكل");
+  const [composerScope, setComposerScope] = useState<"circle" | "topic">("circle");
+  const [composerTopic, setComposerTopic] = useState(topics[0]);
   const [draft, setDraft] = useState("");
+  const [publishError, setPublishError] = useState(false);
   const [posted, setPosted] = useState(false);
-  const [liked, setLiked] = useState<number[]>([]);
+  const [insightfulPosts, setInsightfulPosts] = useState<number[]>([]);
   const [saved, setSaved] = useState<number[]>([]);
   const [reportedPosts, setReportedPosts] = useState<number[]>([]);
   const [lowValuePosts, setLowValuePosts] = useState<number[]>([]);
@@ -733,14 +798,15 @@ const Index = () => {
   }, [isRtl, locale, t.title]);
 
   const visiblePosts = useMemo(() => {
+    const scopedPosts = activeTab === "circles" ? posts.filter((post) => post.circle !== "عام") : activeTab === "topics" ? posts.filter((post) => post.circle === "عام") : posts;
     if (activeTopic !== "الكل" && activeTopic !== "All") {
-      return posts.filter((post) => post.topic === activeTopic);
+      return scopedPosts.filter((post) => post.topic === activeTopic);
     }
-    return posts;
-  }, [activeTopic]);
+    return scopedPosts;
+  }, [activeTab, activeTopic]);
 
-  const toggleLike = (id: number) => {
-    setLiked((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  const toggleInsightful = (id: number) => {
+    setInsightfulPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
   const toggleSaved = (id: number) => {
@@ -769,6 +835,11 @@ const Index = () => {
 
   const publish = () => {
     if (!draft.trim()) return;
+    if (composerScope === "topic" && draft.trim().length < 24) {
+      setPublishError(true);
+      return;
+    }
+    setPublishError(false);
     setDraft("");
     setPosted(true);
     window.setTimeout(() => setPosted(false), 2800);
@@ -872,9 +943,16 @@ const Index = () => {
                 <div className="flex gap-3">
                   <Avatar className="h-10 w-10 shrink-0"><AvatarFallback className="bg-[#eadfd4] font-semibold text-[#886d53]">ل</AvatarFallback></Avatar>
                   <div className="min-w-0 flex-1">
-                    <textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={t.writePlaceholder} className="min-h-[62px] w-full resize-none border-0 bg-transparent pt-1 text-sm leading-6 text-[#3d4b43] outline-none placeholder:text-[#a4ada6]" />
+                    <textarea value={draft} onChange={(event) => { setDraft(event.target.value); setPublishError(false); }} placeholder={t.writePlaceholder} className="min-h-[62px] w-full resize-none border-0 bg-transparent pt-1 text-sm leading-6 text-[#3d4b43] outline-none placeholder:text-[#a4ada6]" />
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                      <button onClick={() => { setComposerScope("circle"); setPublishError(false); }} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${composerScope === "circle" ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-[#f1f4ee]"}`}>{t.privateCircle}</button>
+                      <button onClick={() => { setComposerScope("topic"); setPublishError(false); }} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${composerScope === "topic" ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-[#f1f4ee]"}`}>{t.publicTopic}</button>
+                      {composerScope === "topic" && <select value={composerTopic} onChange={(event) => setComposerTopic(event.target.value)} aria-label={t.topicLabel} className="rounded-xl border border-[#dce5d9] bg-[#f8faf5] px-3 py-2 text-xs font-semibold text-[#647762] outline-none focus:ring-2 focus:ring-[#cadbc5]">{topics.map((topic) => <option key={topic}>{topic}</option>)}</select>}
+                    </div>
+                    {composerScope === "topic" && <div className="mb-3 flex items-start gap-2 rounded-xl bg-[#f0f5ed] px-3 py-2 text-xs leading-5 text-[#728570]"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#73916b]" /><span><strong className="font-bold text-[#526b4d]">{t.qualityGate}</strong> · {t.qualityGateDesc}</span></div>}
+                    {publishError && <div className="mb-3 rounded-xl bg-[#f8e9e5] px-3 py-2 text-xs font-semibold leading-5 text-[#a65e52]">{t.qualityError}</div>}
                     <div className="flex items-center justify-between border-t border-[#edf0ea] pt-3">
-                      <div className="flex items-center gap-2 text-xs text-[#93a096]"><button className="rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]"><Plus className="h-4 w-4" /></button><span>{t.publicCircle}</span></div>
+                      <div className="flex items-center gap-2 text-xs text-[#93a096]"><button className="rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]"><Plus className="h-4 w-4" /></button><span>{composerScope === "circle" ? t.privateCircle : `${t.publicTopic} · ${composerTopic}`}</span></div>
                       <Button onClick={publish} size="sm" className="rounded-xl bg-[#6b7f5a] px-4 text-xs font-semibold text-white shadow-[0_5px_12px_rgba(107,127,90,0.18)] hover:bg-[#587047]">{t.publish}<Send className="h-3.5 w-3.5" /></Button>
                     </div>
                   </div>
@@ -893,7 +971,7 @@ const Index = () => {
 
               <div className="mt-4 space-y-4">
                 {visiblePosts.map((post) => {
-                  const isLiked = liked.includes(post.id);
+                  const isInsightful = insightfulPosts.includes(post.id);
                   const isSaved = saved.includes(post.id);
                   const isReported = reportedPosts.includes(post.id);
                   const hasLowValueSignal = lowValuePosts.includes(post.id);
@@ -921,9 +999,8 @@ const Index = () => {
                       {isRevealed && <button onClick={() => toggleSensitivePost(post.id)} className="absolute end-3 top-3 inline-flex items-center gap-2 rounded-xl bg-[#fbfaf7]/90 px-3 py-2 text-xs font-bold text-[#59695c] shadow-sm backdrop-blur-sm"><EyeOff className="h-4 w-4" />{t.hideSensitive}</button>}
                     </div>}
                     <div className="mt-5 flex flex-wrap items-center gap-1 border-t border-[#edf0ea] pt-3 text-xs text-[#9aa59d]">
-                      <button onClick={() => toggleLike(post.id)} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#f6eae5] ${isLiked ? "text-[#bd755e]" : "hover:text-[#b86e57]"}`}><Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />{isLiked ? t.liked : t.like}{isLiked && <span>{post.likes + 1}</span>}</button>
+                      <button onClick={() => toggleInsightful(post.id)} aria-pressed={isInsightful} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition ${isInsightful ? "bg-[#e3ecdf] text-[#587152]" : "hover:bg-[#edf3e9] hover:text-[#66805c]"}`}><Sparkles className={`h-4 w-4 ${isInsightful ? "fill-current" : ""}`} />{isInsightful ? t.insightfulDone : t.insightful}</button>
                       <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</button>
-                      <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><ArrowUpLeft className="h-4 w-4" />{t.share}</button>
                       <button onClick={() => reportPost(post.id)} disabled={isReported} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition ${isReported ? "text-[#bd755e]" : "hover:bg-[#f6eae5] hover:text-[#b86e57]"}`}><Flag className={`h-4 w-4 ${isReported ? "fill-current" : ""}`} />{isReported ? t.reported : t.reportVulgar}</button>
                       <button onClick={() => toggleLowValueSignal(post.id)} aria-pressed={hasLowValueSignal} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-start transition ${hasLowValueSignal ? "bg-[#f4e8d9] text-[#9a724d]" : "hover:bg-[#f5efe7] hover:text-[#9a724d]"}`}><Sparkles className={`h-4 w-4 ${hasLowValueSignal ? "fill-current" : ""}`} />{hasLowValueSignal ? t.signalSent : t.lowValueReport}</button>
                       <button onClick={() => toggleValuesSignal(post.id)} aria-pressed={hasValuesSignal} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-start transition ${hasValuesSignal ? "bg-[#f6e2df] text-[#a25f57]" : "hover:bg-[#f8ecea] hover:text-[#a25f57]"}`}><ShieldAlert className={`h-4 w-4 ${hasValuesSignal ? "fill-current" : ""}`} />{hasValuesSignal ? t.signalSent : t.valuesReport}</button>
@@ -957,6 +1034,12 @@ const Index = () => {
                 <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
                   <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-bold text-[#536258]">{t.topicsTitle}</h2><Compass className="h-4 w-4 text-[#93a394]" /></div>
                   <div className="flex flex-wrap gap-2">{topics.map((topic) => { const isFollowed = followedTopics.includes(topic); return <button key={topic} onClick={() => toggleTopic(topic)} className={`rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition ${isFollowed ? "border-[#d1dfcc] bg-[#edf3e9] text-[#63805d]" : "border-[#e6e8e2] text-[#97a29a] hover:border-[#cad9c6]"}`}>{isFollowed ? "✓ " : "+ "}{topic}</button>; })}</div>
+                </div>
+
+                <div className="rounded-[26px] border border-[#dbe5d7] bg-[#eef4eb] p-5">
+                  <div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#dce9d8] text-[#698361]"><ShieldCheck className="h-4 w-4" /></div><div><h2 className="text-sm font-bold text-[#526b4d]">{t.qualityGate}</h2><p className="mt-1 text-xs leading-5 text-[#7a8d77]">{t.qualityGateDesc}</p></div></div>
+                  <div className="mt-4 flex items-center justify-between text-[10px] font-semibold text-[#78906f]"><span>{t.meaningfulOnly}</span><span>84%</span></div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#d7e4d3]"><div className="h-full w-[84%] rounded-full bg-[#789870]" /></div>
                 </div>
 
                 <div className="flex items-center gap-2 px-2 text-[10px] leading-5 text-[#a0aaa1]"><ShieldCheck className="h-4 w-4 shrink-0 text-[#8da083]" /> {t.noNumbers}. {t.quietSpace}.</div>
