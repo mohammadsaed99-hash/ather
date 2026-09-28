@@ -11,6 +11,7 @@ import CompleteProfile from "./pages/CompleteProfile";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Preview from "./pages/Preview";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/preview" element={<Preview />} />
             <Route path="/login" element={<Login />} />
             <Route path="/complete-profile" element={<ProtectedRoute><CompleteProfile /></ProtectedRoute>} />
             <Route path="/" element={<ProtectedRoute><ProfileGate><Index /></ProfileGate></ProtectedRoute>} />
