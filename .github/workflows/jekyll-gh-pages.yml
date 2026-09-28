@@ -33,7 +33,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Prepare SPA for GitHub Pages
+      - name: Check build output
+        run: |
+          echo "=== DIST CONTENT ==="
+          find dist -maxdepth 3 -type f -print
+          echo "=== INDEX.HTML ==="
+          cat dist/index.html
+
+      - name: Prepare SPA
         run: cp dist/index.html dist/404.html
 
       - name: Setup Pages
