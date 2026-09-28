@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Check, Copy, ExternalLink, Send, Share2, UsersRound, X } from "lucide-react";
 
-type InviteLocale = "ar" | "en" | "fr" | "zh" | "es" | "hi";
+type InviteLocale = "ar" | "en" | "fr" | "zh" | "es" | "hi" | "bn" | "ur" | "id" | "de" | "vi" | "tr" | "ja" | "ru" | "pt" | "ko";
+type BaseInviteLocale = "ar" | "en" | "fr" | "zh" | "es" | "hi";
 
 type InviteCopy = {
   invite: string;
@@ -17,7 +18,7 @@ type InviteCopy = {
   tagline: string;
 };
 
-const copy: Record<InviteLocale, InviteCopy> = {
+const copy: Record<BaseInviteLocale, InviteCopy> = {
   ar: { invite: "دعوة الأصدقاء", title: "شارك أَثَر مع أصدقائك", description: "أرسل رابط التطبيق عبر وسيلتك المفضلة.", whatsapp: "واتساب", telegram: "تيليغرام", facebook: "فيسبوك", x: "منصة X", copy: "نسخ الرابط", copied: "تم نسخ الرابط", native: "مشاركة سريعة", tagline: "اترك أثرًا، لا ضجيجًا." },
   en: { invite: "Invite friends", title: "Share Athar with friends", description: "Send the app link through your favorite channel.", whatsapp: "WhatsApp", telegram: "Telegram", facebook: "Facebook", x: "X", copy: "Copy link", copied: "Link copied", native: "Quick share", tagline: "Leave a trace, not noise." },
   fr: { invite: "Inviter des amis", title: "Partager Athar avec vos amis", description: "Envoyez le lien de l’application par votre moyen préféré.", whatsapp: "WhatsApp", telegram: "Telegram", facebook: "Facebook", x: "X", copy: "Copier le lien", copied: "Lien copié", native: "Partage rapide", tagline: "Laissez une trace, pas du bruit." },
@@ -26,10 +27,24 @@ const copy: Record<InviteLocale, InviteCopy> = {
   hi: { invite: "दोस्तों को आमंत्रित करें", title: "दोस्तों के साथ Athar साझा करें", description: "अपनी पसंद के माध्यम से ऐप का लिंक भेजें।", whatsapp: "WhatsApp", telegram: "Telegram", facebook: "Facebook", x: "X", copy: "लिंक कॉपी करें", copied: "लिंक कॉपी हो गया", native: "त्वरित साझा करें", tagline: "शोर नहीं, एक छाप छोड़ें।" },
 };
 
+const translatedInviteCopy: Record<InviteLocale, InviteCopy> = {
+  ...copy,
+  bn: { ...copy.en, invite: "বন্ধুদের আমন্ত্রণ", title: "বন্ধুদের সঙ্গে Athar শেয়ার করুন", description: "আপনার পছন্দের মাধ্যমে অ্যাপের লিংক পাঠান।", copy: "লিংক কপি করুন", copied: "লিংক কপি হয়েছে", native: "দ্রুত শেয়ার", tagline: "শব্দ নয়, একটি ছাপ রেখে যান।" },
+  ur: { ...copy.en, invite: "دوستوں کو دعوت دیں", title: "دوستوں کے ساتھ Athar شیئر کریں", description: "اپنی پسندیدہ سروس کے ذریعے ایپ کا لنک بھیجیں۔", copy: "لنک کاپی کریں", copied: "لنک کاپی ہو گیا", native: "فوری شیئر", tagline: "شور نہیں، ایک نشان چھوڑیں۔" },
+  id: { ...copy.en, invite: "Undang teman", title: "Bagikan Athar dengan teman", description: "Kirim tautan aplikasi melalui layanan favoritmu.", copy: "Salin tautan", copied: "Tautan disalin", native: "Bagikan cepat", tagline: "Tinggalkan jejak, bukan kebisingan." },
+  de: { ...copy.en, invite: "Freunde einladen", title: "Athar mit Freunden teilen", description: "Sende den App-Link über deinen bevorzugten Kanal.", copy: "Link kopieren", copied: "Link kopiert", native: "Schnell teilen", tagline: "Hinterlasse eine Spur, keinen Lärm." },
+  vi: { ...copy.en, invite: "Mời bạn bè", title: "Chia sẻ Athar với bạn bè", description: "Gửi liên kết ứng dụng qua kênh bạn yêu thích.", copy: "Sao chép liên kết", copied: "Đã sao chép", native: "Chia sẻ nhanh", tagline: "Để lại dấu ấn, đừng để lại ồn ào." },
+  tr: { ...copy.en, invite: "Arkadaşlarını davet et", title: "Athar'ı arkadaşlarınla paylaş", description: "Uygulama bağlantısını tercih ettiğin kanaldan gönder.", copy: "Bağlantıyı kopyala", copied: "Bağlantı kopyalandı", native: "Hızlı paylaş", tagline: "Gürültü değil, iz bırak." },
+  ja: { ...copy.en, invite: "友達を招待", title: "Atharを友達と共有", description: "好きな方法でアプリのリンクを送信できます。", copy: "リンクをコピー", copied: "リンクをコピーしました", native: "クイック共有", tagline: "騒がしさではなく、足跡を残そう。" },
+  ru: { ...copy.en, invite: "Пригласить друзей", title: "Поделиться Athar с друзьями", description: "Отправьте ссылку на приложение удобным способом.", copy: "Скопировать ссылку", copied: "Ссылка скопирована", native: "Быстро поделиться", tagline: "Оставляй след, а не шум." },
+  pt: { ...copy.en, invite: "Convidar amigos", title: "Compartilhe o Athar com amigos", description: "Envie o link do aplicativo pelo seu canal favorito.", copy: "Copiar link", copied: "Link copiado", native: "Compartilhar rápido", tagline: "Deixe uma marca, não ruído." },
+  ko: { ...copy.en, invite: "친구 초대", title: "친구와 Athar 공유하기", description: "원하는 채널로 앱 링크를 보내세요.", copy: "링크 복사", copied: "링크가 복사되었습니다", native: "빠른 공유", tagline: "소음이 아닌 흔적을 남겨요." },
+};
+
 const InviteFriends = ({ locale = "ar", compact = false }: { locale?: InviteLocale; compact?: boolean }) => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const t = copy[locale];
+  const t = translatedInviteCopy[locale];
   const url = typeof window === "undefined" ? "" : window.location.origin;
   const message = t.tagline;
   const encodedUrl = encodeURIComponent(url);
