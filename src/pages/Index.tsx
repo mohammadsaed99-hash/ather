@@ -28,6 +28,7 @@ import {
   Plus,
   Search,
   Send,
+  Share2,
   Settings2,
   ShieldAlert,
   ShieldCheck,
@@ -72,6 +73,9 @@ type Copy = {
   justNow: string;
   replies: string;
   share: string;
+  inviteFriends: string;
+  inviteTitle: string;
+  inviteDescription: string;
   saved: string;
   save: string;
   liked: string;
@@ -149,6 +153,9 @@ const copy: Record<Locale, Copy> = {
     justNow: "الآن",
     replies: "ردود",
     share: "مشاركة",
+    inviteFriends: "دعوة الأصدقاء",
+    inviteTitle: "شارك أَثَر مع من تحب",
+    inviteDescription: "ادعُ أصدقاءك لتحميل التطبيق والانضمام إلى مساحة هادئة.",
     saved: "محفوظ",
     save: "حفظ",
     liked: "أعجبك",
@@ -224,6 +231,9 @@ const copy: Record<Locale, Copy> = {
     justNow: "Just now",
     replies: "replies",
     share: "Share",
+    inviteFriends: "Invite friends",
+    inviteTitle: "Share Athar with people you care about",
+    inviteDescription: "Invite friends to download the app and join a quieter space.",
     saved: "Saved",
     save: "Save",
     liked: "Liked",
@@ -299,6 +309,9 @@ const copy: Record<Locale, Copy> = {
     justNow: "À l'instant",
     replies: "réponses",
     share: "Partager",
+    inviteFriends: "Inviter des amis",
+    inviteTitle: "Partagez Athar avec vos proches",
+    inviteDescription: "Invitez vos amis à télécharger l’application et à rejoindre un espace plus calme.",
     saved: "Enregistré",
     save: "Enregistrer",
     liked: "Aimé",
@@ -374,6 +387,9 @@ const copy: Record<Locale, Copy> = {
     justNow: "刚刚",
     replies: "条回复",
     share: "分享",
+    inviteFriends: "邀请朋友",
+    inviteTitle: "和你在乎的人分享 Athar",
+    inviteDescription: "邀请朋友下载应用，加入更安静的空间。",
     saved: "已收藏",
     save: "收藏",
     liked: "已喜欢",
@@ -449,6 +465,9 @@ const copy: Record<Locale, Copy> = {
     justNow: "Ahora",
     replies: "respuestas",
     share: "Compartir",
+    inviteFriends: "Invitar amigos",
+    inviteTitle: "Comparte Athar con quienes quieres",
+    inviteDescription: "Invita a tus amigos a descargar la aplicación y unirse a un espacio más tranquilo.",
     saved: "Guardado",
     save: "Guardar",
     liked: "Te gusta",
@@ -524,6 +543,9 @@ const copy: Record<Locale, Copy> = {
     justNow: "अभी",
     replies: "जवाब",
     share: "साझा करें",
+    inviteFriends: "दोस्तों को आमंत्रित करें",
+    inviteTitle: "Athar को अपने प्रिय लोगों के साथ साझा करें",
+    inviteDescription: "अपने दोस्तों को ऐप डाउनलोड करने और शांत जगह से जुड़ने के लिए आमंत्रित करें।",
     saved: "सहेजा गया",
     save: "सहेजें",
     liked: "पसंद किया",
@@ -838,6 +860,7 @@ const Index = () => {
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const [locale, setLocale] = useState<Locale>("ar");
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const [activeNav, setActiveNav] = useState<NavKey>("home");
   const [activeTab, setActiveTab] = useState<"all" | "circles" | "topics">("all");
   const [activeTopic, setActiveTopic] = useState("الكل");
@@ -1033,6 +1056,33 @@ const Index = () => {
     }
   };
 
+  const shareInvite = async (channel: "native" | "whatsapp" | "telegram" | "facebook" | "x" | "email") => {
+    const url = window.location.origin;
+    const message = `${t.inviteTitle}\n${t.inviteDescription}`;
+    if (channel === "native" && navigator.share) {
+      try {
+        await navigator.share({ title: "أَثَر", text: message, url });
+      } catch {
+        return;
+      }
+      setInviteOpen(false);
+      return;
+    }
+    if (channel === "native") return;
+
+    const encodedUrl = encodeURIComponent(url);
+    const encodedMessage = encodeURIComponent(message);
+    const targets = {
+      whatsapp: `https://wa.me/?text=${encodedMessage}%20${encodedUrl}`,
+      telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedMessage}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      x: `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedUrl}`,
+      email: `mailto:?subject=${encodeURIComponent(t.inviteTitle)}&body=${encodedMessage}%20${encodedUrl}`,
+    } as const;
+    window.open(targets[channel as keyof typeof targets], "_blank", "noopener,noreferrer");
+    setInviteOpen(false);
+  };
+
   const getNavLabel = (key: NavKey) => t.nav[key];
 
   return (
@@ -1084,6 +1134,20 @@ const Index = () => {
             <div className="hidden items-center gap-2 text-xs font-medium text-[#849087] lg:flex"><span className={`h-2 w-2 rounded-full ${activeNav === "ads" ? "bg-[#b99670]" : "bg-[#87a174]"}`} /> {activeNav === "ads" ? t.adsTitle : t.timeline}</div>
             <div className="ms-auto flex items-center gap-2 sm:gap-3">
               <button className="hidden items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-[#809087] transition hover:bg-white sm:flex"><Search className="h-4 w-4" />{t.search}</button>
+              <div className="relative">
+                <button onClick={() => setInviteOpen((open) => !open)} aria-expanded={inviteOpen} className="flex items-center gap-2 rounded-xl border border-[#d8e3d3] bg-[#edf3e9] px-3 py-2 text-xs font-semibold text-[#587152] shadow-sm transition hover:bg-[#e3ecdf]"><Share2 className="h-4 w-4" /><span className="hidden sm:inline">{t.inviteFriends}</span></button>
+                {inviteOpen && <div className="absolute end-0 top-12 z-30 w-[260px] rounded-2xl border border-[#e2e5dc] bg-[#fbfaf7] p-4 shadow-[0_18px_45px_rgba(65,81,69,0.14)]">
+                  <div className="mb-3"><p className="text-sm font-bold text-[#536258]">{t.inviteTitle}</p><p className="mt-1 text-xs leading-5 text-[#89958b]">{t.inviteDescription}</p></div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {navigator.share && <button onClick={() => void shareInvite("native")} className="col-span-2 rounded-xl bg-[#6b7f5a] px-3 py-2.5 text-xs font-bold text-white transition hover:bg-[#587047]">{t.share}</button>}
+                    <button onClick={() => void shareInvite("whatsapp")} className="rounded-xl bg-[#e6f4e8] px-3 py-2.5 text-xs font-bold text-[#347345] transition hover:bg-[#d8eedc]">WhatsApp</button>
+                    <button onClick={() => void shareInvite("telegram")} className="rounded-xl bg-[#e7f1f7] px-3 py-2.5 text-xs font-bold text-[#39718e] transition hover:bg-[#dbeaf2]">Telegram</button>
+                    <button onClick={() => void shareInvite("facebook")} className="rounded-xl bg-[#e7edf8] px-3 py-2.5 text-xs font-bold text-[#42659a] transition hover:bg-[#dce5f5]">Facebook</button>
+                    <button onClick={() => void shareInvite("x")} className="rounded-xl bg-[#eef0ef] px-3 py-2.5 text-xs font-bold text-[#3c4842] transition hover:bg-[#e3e7e4]">X</button>
+                    <button onClick={() => void shareInvite("email")} className="col-span-2 rounded-xl border border-[#dfe5db] px-3 py-2.5 text-xs font-bold text-[#657565] transition hover:bg-[#f1f4ee]">Email</button>
+                  </div>
+                </div>}
+              </div>
               <div className="relative">
                 <button onClick={() => setLanguageOpen((open) => !open)} className="flex items-center gap-2 rounded-xl border border-[#e2e5dc] bg-[#fbfaf7] px-3 py-2 text-xs font-semibold text-[#607163] shadow-sm transition hover:border-[#cbd7c6]">
                   <Globe2 className="h-4 w-4" /><span>{languageNames[locale]}</span><ChevronDown className="h-3.5 w-3.5" />
