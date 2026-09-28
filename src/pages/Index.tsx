@@ -3,6 +3,7 @@ import { useSession } from "@supabase/auth-helpers-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
+import InviteFriends from "@/components/InviteFriends";
 import {
   ArrowUpLeft,
   Bell,
@@ -1036,7 +1037,7 @@ const Index = () => {
   const getNavLabel = (key: NavKey) => t.nav[key];
 
   return (
-    <div className="athar-app min-h-screen bg-[#f5f3ee] text-[#28342f]" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="athar-app min-h-screen bg-[#f5f3ee] text-[#28342f]" dir={isRtl ? "rtl" : "ltr">
       <div className="mx-auto flex min-h-screen w-full max-w-[1600px]">
         <aside className="hidden w-[248px] shrink-0 flex-col border-e border-[#dfe2d9] bg-[#f9f8f4] px-5 py-7 lg:flex">
           <div className="flex items-center gap-3 px-3">
@@ -1084,6 +1085,7 @@ const Index = () => {
             <div className="hidden items-center gap-2 text-xs font-medium text-[#849087] lg:flex"><span className={`h-2 w-2 rounded-full ${activeNav === "ads" ? "bg-[#b99670]" : "bg-[#87a174]"}`} /> {activeNav === "ads" ? t.adsTitle : t.timeline}</div>
             <div className="ms-auto flex items-center gap-2 sm:gap-3">
               <button className="hidden items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-[#809087] transition hover:bg-white sm:flex"><Search className="h-4 w-4" />{t.search}</button>
+              <InviteFriends locale={locale} compact={false} />
               <div className="relative">
                 <button onClick={() => setLanguageOpen((open) => !open)} className="flex items-center gap-2 rounded-xl border border-[#e2e5dc] bg-[#fbfaf7] px-3 py-2 text-xs font-semibold text-[#607163] shadow-sm transition hover:border-[#cbd7c6]">
                   <Globe2 className="h-4 w-4" /><span>{languageNames[locale]}</span><ChevronDown className="h-3.5 w-3.5" />
