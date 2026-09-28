@@ -1657,82 +1657,55 @@ const Index = () => {
                 {posted && <div className="mt-3 flex items-center gap-2 rounded-xl bg-[#edf5e9] px-3 py-2 text-xs font-semibold text-[#5d7955]"><CheckCircle2 className="h-4 w-4" /> {t.published}</div>}
               </div>
 
-              <div className="mt-7 flex flex-wrap items-center gap-2 border-b border-[#e3e6df] pb-3">
-                {(["all", "circles", "topics"] as const).map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${activeTab === tab ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-white"}`}>{tab === "all" ? t.allFollowing : tab === "circles" ? t.myCircles : t.myTopics}</button>)}
-                <div className="ms-auto flex items-center gap-1 text-[11px] text-[#9aa49b]"><span className="h-1.5 w-1.5 rounded-full bg-[#7f9a73]" /> {visiblePosts.length} {t.newLabel.toLowerCase()}</div>
-              </div>
+                             <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-sm font-bold text-[#536258]">
+                      {t.circlesTitle}
+                    </h2>
+                    <button className="text-xs font-semibold text-[#78906f] hover:text-[#4e6a48]">
+                      {t.seeAll}
+                    </button>
+                  </div>
 
-              <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto pb-1">
-                {["الكل", ...topics].map((topic) => <button key={topic} onClick={() => setActiveTopic(topic)} className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition ${activeTopic === topic ? "border-[#b8cbb1] bg-[#eaf1e7] text-[#587152]" : "border-[#e3e7df] bg-[#fafbf8] text-[#89958b] hover:border-[#cbd9c7]"}`}>{topic}</button>)}
-              </div>
-
-              <div className="mt-4 space-y-4">
-                {visiblePosts.map((post) => {
-                  const isLiked = likedPosts.includes(post.id);
-                  const isSaved = saved.includes(post.id);
-                  const isReported = reportedPosts.includes(post.id);
-                  const isRevealed = revealedPosts.includes(post.id);
-                  return <article key={post.id} onDoubleClick={() => toggleLike(post.id)} className="post-card rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)] sm:p-6">
-                    <div className="flex items-start gap-3">
-                      <Avatar className={`h-10 w-10 shrink-0 ${post.tone}`}><AvatarFallback className={post.tone}>{post.initials}</AvatarFallback></Avatar>
-                      <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-x-2 gap-y-1">{post.authorId ? <Link to={`/profile/${post.authorId}`} className="text-sm font-bold text-[#3d4b43] transition hover:text-[#5145a5]">{post.author}</Link> : <span className="text-sm font-bold text-[#3d4b43]">{post.author}</span>}<span className="text-xs text-[#9aa59c]">@{post.handle}</span><span className="text-[#b3bcb4]">·</span><span className="text-xs text-[#9aa59c]">{post.time} {t.minutes}</span></div><div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#89978c]"><span className="rounded-full bg-[#eef2eb] px-2 py-0.5 text-[#6f806d]">{post.circle}</span><span>·</span><span>{post.topic}</span></div></div>
-                      <div className="relative"><button onClick={(event) => { event.stopPropagation(); setOpenPostMenu((current) => current === post.id ? null : post.id); }} aria-label="خيارات المنشور" aria-expanded={openPostMenu === post.id} className="rounded-lg p-1 text-[#a4ada5] hover:bg-[#f0f2ed] hover:text-[#607260]"><MoreHorizontal className="h-4 w-4" /></button>{openPostMenu === post.id && <div className="absolute end-0 top-8 z-20 w-48 rounded-2xl border border-[#e2e5dc] bg-[#fcfbff] p-2 shadow-[0_16px_36px_rgba(68,55,126,0.15)]"><button onClick={() => openReportDialog(post.id)} disabled={isReported} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-start text-xs font-semibold text-[#a65e72] transition hover:bg-[#f9eaf0] disabled:cursor-not-allowed disabled:opacity-50"><Flag className="h-4 w-4" />{isReported ? "تم الإبلاغ" : "الإبلاغ عن المنشور"}</button></div>}</div>
-                    </div>
-                    <p className="mt-5 text-[15px] leading-8 text-[#4d5b52]">{post.body[locale] ?? post.body.en}</p>
-                    {post.mediaUrl && <div className="mt-4 overflow-hidden rounded-[22px] border border-[#e0e6dc] bg-[#edf2e9]">{post.mediaType === "video" ? <video src={post.mediaUrl} controls className="max-h-[420px] w-full object-cover" /> : <img src={post.mediaUrl} alt="" className="max-h-[420px] w-full object-cover" />}</div>}
-                    {post.sensitive && <div className="relative mt-4 overflow-hidden rounded-[22px] border border-[#ded8d0] bg-[#e9e2d9]">
-                      <div className={`relative h-56 overflow-hidden transition duration-500 ${isRevealed ? "" : "blur-[18px] scale-[1.04]"} ${post.imageTone}`} aria-hidden={!isRevealed}>
-                        <div className="absolute inset-x-10 top-8 h-32 rounded-[42%] bg-[#9d7f75] opacity-80" />
-                        <div className="absolute bottom-[-30px] start-8 h-36 w-36 rounded-full bg-[#b89583] opacity-80" />
-                        <div className="absolute bottom-[-25px] end-10 h-44 w-28 rotate-12 rounded-[48%] bg-[#876d68] opacity-75" />
-                        <div className="absolute start-1/2 top-7 h-20 w-20 -translate-x-1/2 rounded-full bg-[#d6b69f] opacity-90" />
-                      </div>
-                      {!isRevealed && <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#354039]/45 px-5 text-center text-white">
-                        <ShieldAlert className="mb-3 h-7 w-7" />
-                        <p className="text-sm font-bold">{t.sensitiveNotice}</p>
-                        <button onClick={() => toggleSensitivePost(post.id)} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-xs font-bold text-[#52654f] shadow-sm transition hover:bg-[#f1f5ed]"><Eye className="h-4 w-4" />{t.showSensitive}</button>
-                      </div>}
-                      {isRevealed && <button onClick={() => toggleSensitivePost(post.id)} className="absolute end-3 top-3 inline-flex items-center gap-2 rounded-xl bg-[#fbfaf7]/90 px-3 py-2 text-xs font-bold text-[#59695c] shadow-sm backdrop-blur-sm"><EyeOff className="h-4 w-4" />{t.hideSensitive}</button>}
-                    </div>}
-                    <div className="mt-5 flex flex-wrap items-center gap-1 border-t border-[#edf0ea] pt-3 text-xs text-[#9aa59d]">
-                      <button onClick={(event) => { event.stopPropagation(); toggleLike(post.id); }} aria-pressed={isLiked} className={`flex items-center gap-1.5 rounded-xl px-2.5 py-2 transition ${isLiked ? "bg-[#fde7eb] text-[#dd4f68]" : "hover:bg-[#fdf0f2] hover:text-[#dd4f68]"}`}><Heart className={`h-4 w-4 transition ${isLiked ? "fill-current" : ""}`} />{isLiked ? t.liked : t.like}</button>
-                      <button onClick={(event) => event.stopPropagation()} className="flex items-center gap-1.5 rounded-xl px-2.5 py-2 transition hover:bg-[#eeebfa] hover:text-[#6656a7]"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</button>
-                      <button onClick={(event) => { event.stopPropagation(); toggleSaved(post.id); }} className={`ms-auto rounded-xl p-2 transition hover:bg-[#eeebfa] ${isSaved ? "text-[#5145a5]" : "text-[#9aa59d] hover:text-[#6656a7]"}`} aria-label={isSaved ? t.saved : t.save}><Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} /></button>
-                    </div>
-                  </article>;
-                })}
-              </div>
-
-              <div className="mt-6 flex flex-col items-center rounded-[26px] border border-dashed border-[#cbd8c5] bg-[#f0f5ed] px-6 py-8 text-center">
-                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#e1ecdc] text-[#6b875f]"><Leaf className="h-5 w-5" /></div>
-                <h3 className="text-sm font-bold text-[#526b4d]">{t.noMore}</h3><p className="mt-1 max-w-xs text-xs leading-5 text-[#82927e]">{t.noMoreDesc}</p>
-              </div>
-              {reportingPost !== null && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#29263d]/45 px-4 py-6" role="dialog" aria-modal="true" aria-labelledby="report-post-title">
-                <div className="w-full max-w-md rounded-[28px] border border-[#e2e0ef] bg-[#fcfbff] p-5 shadow-[0_24px_70px_rgba(38,31,75,0.22)] sm:p-6">
-                  <div className="flex items-start justify-between gap-4"><div><h2 id="report-post-title" className="text-lg font-bold text-[#3f3568]">الإبلاغ عن المنشور</h2><p className="mt-1 text-xs leading-5 text-[#827b98]">اختر السبب الأقرب لمساعدتنا على مراجعة المنشور.</p></div><button onClick={() => setReportingPost(null)} className="rounded-xl px-2 py-1 text-sm font-bold text-[#928ba6] hover:bg-[#eeebfa]" aria-label="إغلاق">×</button></div>
-                  <div className="mt-5 space-y-2">{reportReasons.map((reason) => <label key={reason} className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-3 py-3 text-sm font-semibold transition ${reportReason === reason ? "border-[#9c8ed0] bg-[#f0edfb] text-[#5145a5]" : "border-[#e6e2ef] text-[#665f7c] hover:bg-[#f8f7fd]"}`}><input type="radio" name="post-report-reason" value={reason} checked={reportReason === reason} onChange={(event) => setReportReason(event.target.value)} className="h-4 w-4 accent-[#5145a5]" />{reason}</label>)}</div>
-                  {reportMessage && <p className="mt-4 rounded-2xl bg-[#eeeafa] px-3 py-2.5 text-xs font-semibold leading-5 text-[#584a91]">{reportMessage}</p>}
-                  <div className="mt-5 flex items-center justify-end gap-2"><button onClick={() => setReportingPost(null)} className="rounded-xl px-4 py-2.5 text-xs font-bold text-[#817a98] hover:bg-[#f3f1f9]">إلغاء</button><button onClick={submitReport} disabled={!reportReason || reportSubmitting || (reportingPost !== null && reportedPosts.includes(reportingPost))} className="rounded-xl bg-[#5145a5] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#403583] disabled:cursor-not-allowed disabled:opacity-50">{reportSubmitting ? "جارٍ الإرسال…" : reportedPosts.includes(reportingPost) ? "تم الإبلاغ" : "إرسال البلاغ"}</button></div>
-                </div>
-              </div>}
-            </section>
-
-            <aside className="hidden space-y-5 xl:block">
-              <div className="sticky top-6 space-y-5">
-                <div className="mindful-card overflow-hidden rounded-[26px] border border-[#e1d8c9] bg-[#f4ede3] p-5">
-                  <div className="mb-8 flex items-start justify-between"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fffaf2] text-[#ad8862]"><Leaf className="h-5 w-5" /></div><span className="rounded-full bg-[#eadfce] px-2.5 py-1 text-[10px] font-bold text-[#997753]">02 / 03</span></div>
-                  <h2 className="font-display text-[25px] font-semibold leading-tight tracking-[-0.04em] text-[#6d5946]">{t.mindful}</h2><p className="mt-2 text-xs leading-5 text-[#947e66]">{t.mindfulDesc}</p>
-                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-[#e3d6c3]"><div className="h-full w-2/3 rounded-full bg-[#b99670]" /></div>
-                </div>
-
-                <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
-                  <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-bold text-[#536258]">{t.circlesTitle}</h2><button className="text-xs font-semibold text-[#78906f] hover:text-[#4e6a48]">{t.seeAll}</button></div>
                   <div className="space-y-3">
-                    {[{ name: "العائلة والأصدقاء", icon: "ع", tone: "bg-[#e8dfd5] text-[#8a6d52]" }, { name: "المعارف والعمل", icon: "م", tone: "bg-[#dce7df] text-[#5b7965]" }, { name: "عام", icon: "ع", tone: "bg-[#e0e5eb] text-[#647388]" }].map((circle) => <div key={circle.name} className="flex items-center gap-3"><div className={`flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold ${circle.tone}`}>{circle.icon}</div><span className="text-xs font-medium text-[#718077]">{circle.name}</span><span className="ms-auto h-1.5 w-1.5 rounded-full bg-[#a9b9a3]" /></div>)}
+                    {[
+                      {
+                        name: "العائلة والأصدقاء",
+                        icon: "ع",
+                        tone: "bg-[#e8dfd5] text-[#8a6d52]",
+                      },
+                      {
+                        name: "المعارف والعمل",
+                        icon: "م",
+                        tone: "bg-[#dce7df] text-[#5b7965]",
+                      },
+                      {
+                        name: "عام",
+                        icon: "ع",
+                        tone: "bg-[#e0e5eb] text-[#647388]",
+                      },
+                    ].map((circle) => (
+                      <div
+                        key={circle.name}
+                        className="flex items-center gap-3"
+                      >
+                        <div
+                          className={`flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold ${circle.tone}`}
+                        >
+                          {circle.icon}
+                        </div>
+
+                        <span className="text-xs font-medium text-[#718077]">
+                          {circle.name}
+                        </span>
+
+                        <span className="ms-auto h-1.5 w-1.5 rounded-full bg-[#a9b9a3]" />
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                               <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
+                <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
                   <div className="mb-4 flex items-center justify-between">
                     <h2 className="text-sm font-bold text-[#536258]">
                       {t.topicsTitle}
