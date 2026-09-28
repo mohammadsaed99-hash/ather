@@ -1732,19 +1732,62 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
-                  <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-bold text-[#536258]">{t.topicsTitle}</h2><Compass className="h-4 w-4 text-[#93a394]" /></div>
-                  <div className="flex flex-wrap gap-2">{topics.map((topic) => { const isFollowed = followedTopics.includes(topic); return <button key={topic} onClick={() => toggleTopic(topic)} className={`rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition ${isFollowed ? "border-[#d1dfcc] bg-[#edf3e9] text-[#63805d]" : "border-[#e6e8e2] text-[#97a29a] hover:border-[#cad9c6]"}`}>{isFollowed ? "✓ " : "+ "}{topic}</button>; })}</div>
+                               <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-sm font-bold text-[#536258]">
+                      {t.topicsTitle}
+                    </h2>
+                    <Compass className="h-4 w-4 text-[#93a394]" />
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {topics.map((topic) => {
+                      const isFollowed = followedTopics.includes(topic);
+
+                      return (
+                        <button
+                          key={topic}
+                          onClick={() => toggleTopic(topic)}
+                          className={`rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition ${
+                            isFollowed
+                              ? "border-[#d1dfcc] bg-[#edf3e9] text-[#63805d]"
+                              : "border-[#e6e8e2] text-[#97a29a] hover:border-[#cad9c6]"
+                          }`}
+                        >
+                          {isFollowed ? "✓ " : "+ "}
+                          {topic}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="rounded-[26px] border border-[#dbe5d7] bg-[#eef4eb] p-5">
-                  <div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#dce9d8] text-[#698361]"><ShieldCheck className="h-4 w-4" /></div><div><h2 className="text-sm font-bold text-[#526b4d]">{t.qualityGate}</h2><p className="mt-1 text-xs leading-5 text-[#7a8d77]">{t.qualityGateDesc}</p></div></div>
-                  <div className="mt-4 flex items-center justify-between text-[10px] font-semibold text-[#78906f]"><span>{t.meaningfulOnly}</span><span>84%</span></div>
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#d7e4d3]"><div className="h-full w-[84%] rounded-full bg-[#789870]" /></div>
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#dce9d8] text-[#698361]">
+                      <ShieldCheck className="h-4 w-4" />
+                    </div>
+
+                    <div>
+                      <h2 className="text-sm font-bold text-[#526b4d]">
+                        {t.qualityGate}
+                      </h2>
+
+                      <p className="mt-1 text-xs leading-5 text-[#7a8d77]">
+                        {t.qualityGateDesc}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between text-[10px] font-semibold text-[#78906f]">
+                    <span>{t.meaningfulOnly}</span>
+                    <span>84%</span>
+                  </div>
+
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#d7e4d3]">
+                    <div className="h-full w-[84%] rounded-full bg-[#789870]" />
+                  </div>
                 </div>
-
-                          </div>
-
               </div>
             </aside>
           </div>
@@ -1753,3 +1796,5 @@ const Index = () => {
     </div>
   );
 };
+
+export default Index;
