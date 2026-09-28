@@ -1538,7 +1538,7 @@ const Index = () => {
   const getNavLabel = (key: NavKey) => t.nav[key];
 
   return (
-    <div className="athar-app min-h-screen bg-[#f5f3ee] text-[#28342f]" dir={isRtl ? "rtl" : "ltr">
+    <div className="athar-app min-h-screen bg-[#f5f3ee] text-[#28342f]" dir={isRtl ? "rtl" : "ltr"}>
       <div className="mx-auto flex min-h-screen w-full max-w-[1600px]">
         <aside className="hidden w-[248px] shrink-0 flex-col border-e border-[#dfe2d9] bg-[#f9f8f4] px-5 py-7 lg:flex">
           <div className="flex items-center gap-3 px-3">
