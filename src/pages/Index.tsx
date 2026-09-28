@@ -1743,14 +1743,9 @@ const Index = () => {
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#d7e4d3]"><div className="h-full w-[84%] rounded-full bg-[#789870]" /></div>
                 </div>
 
-                <div className="flex items-center gap-2 px-2 text-[10px] leading-5 text-[#a0aaa1]"><ShieldCheck className="h-4 w-4 shrink-0 text-[#8da083]" /> {t.noNumbers}. {t.quietSpace}.</div>
-              </div>
-            </aside>
-          </div>}
+          </div>
         </main>
       </div>
     </div>
   );
 };
-
-export default Index;
