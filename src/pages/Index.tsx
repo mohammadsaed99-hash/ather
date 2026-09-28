@@ -19,6 +19,7 @@ import {
   Feather,
   Flag,
   Globe2,
+  Heart,
   Home,
   Leaf,
   Languages,
@@ -1054,6 +1055,16 @@ const languageNames: Record<Locale, string> = {
 
 const topics = ["تصوير", "أدب", "علوم", "تقنية", "حياة هادئة"];
 
+const reportReasons = [
+  "تعري",
+  "احتيال",
+  "عنصرية أو كراهية",
+  "استخدام ألفاظ غير لائقة",
+  "مشاكل تتعلق بالملكية الفكرية",
+  "عنف أو إزعاج",
+  "بيع أو ترويج مواد محظورة",
+];
+
 type PostId = string | number;
 
 type FeedPost = {
@@ -1329,11 +1340,14 @@ const Index = () => {
   const [feedError, setFeedError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [posted, setPosted] = useState(false);
-  const [insightfulPosts, setInsightfulPosts] = useState<PostId[]>([]);
+  const [likedPosts, setLikedPosts] = useState<PostId[]>([]);
   const [saved, setSaved] = useState<PostId[]>([]);
   const [reportedPosts, setReportedPosts] = useState<PostId[]>([]);
-  const [lowValuePosts, setLowValuePosts] = useState<PostId[]>([]);
-  const [valuesPosts, setValuesPosts] = useState<PostId[]>([]);
+  const [openPostMenu, setOpenPostMenu] = useState<PostId | null>(null);
+  const [reportingPost, setReportingPost] = useState<PostId | null>(null);
+  const [reportReason, setReportReason] = useState("");
+  const [reportSubmitting, setReportSubmitting] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
   const [revealedPosts, setRevealedPosts] = useState<PostId[]>([]);
   const [followedTopics, setFollowedTopics] = useState<string[]>(["تصوير", "أدب", "علوم"]);
   const t = translatedCopy[locale];
@@ -1405,24 +1419,36 @@ const Index = () => {
     return scopedPosts;
   }, [activeTab, activeTopic, allPosts]);
 
-  const toggleInsightful = (id: PostId) => {
-    setInsightfulPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  const toggleLike = (id: PostId) => {
+    setLikedPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
   const toggleSaved = (id: PostId) => {
     setSaved((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
   };
 
-  const reportPost = (id: PostId) => {
-    setReportedPosts((current) => current.includes(id) ? current : [...current, id]);
+  const openReportDialog = (id: PostId) => {
+    setOpenPostMenu(null);
+    setReportReason("");
+    setReportMessage("");
+    setReportingPost(id);
   };
 
-  const toggleLowValueSignal = (id: PostId) => {
-    setLowValuePosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
-  };
-
-  const toggleValuesSignal = (id: PostId) => {
-    setValuesPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  const submitReport = async () => {
+    if (!session?.user.id || reportingPost === null || !reportReason || reportSubmitting) return;
+    setReportSubmitting(true);
+    setReportMessage("");
+    if (typeof reportingPost === "string") {
+      const { error } = await supabase.from("reports").insert({ reporter_id: session.user.id, post_id: reportingPost, reason: reportReason });
+      if (error && error.code !== "23505") {
+        setReportMessage("تعذر إرسال البلاغ. حاول مرة أخرى.");
+        setReportSubmitting(false);
+        return;
+      }
+    }
+    setReportedPosts((current) => current.includes(reportingPost) ? current : [...current, reportingPost]);
+    setReportMessage("تم استلام بلاغك، شكرًا لمساعدتنا في الحفاظ على أَثَر.");
+    setReportSubmitting(false);
   };
 
   const toggleSensitivePost = (id: PostId) => {
@@ -1642,17 +1668,15 @@ const Index = () => {
 
               <div className="mt-4 space-y-4">
                 {visiblePosts.map((post) => {
-                  const isInsightful = insightfulPosts.includes(post.id);
+                  const isLiked = likedPosts.includes(post.id);
                   const isSaved = saved.includes(post.id);
                   const isReported = reportedPosts.includes(post.id);
-                  const hasLowValueSignal = lowValuePosts.includes(post.id);
-                  const hasValuesSignal = valuesPosts.includes(post.id);
                   const isRevealed = revealedPosts.includes(post.id);
-                  return <article key={post.id} className="post-card rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)] sm:p-6">
+                  return <article key={post.id} onDoubleClick={() => toggleLike(post.id)} className="post-card rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)] sm:p-6">
                     <div className="flex items-start gap-3">
                       <Avatar className={`h-10 w-10 shrink-0 ${post.tone}`}><AvatarFallback className={post.tone}>{post.initials}</AvatarFallback></Avatar>
                       <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-x-2 gap-y-1">{post.authorId ? <Link to={`/profile/${post.authorId}`} className="text-sm font-bold text-[#3d4b43] transition hover:text-[#5145a5]">{post.author}</Link> : <span className="text-sm font-bold text-[#3d4b43]">{post.author}</span>}<span className="text-xs text-[#9aa59c]">@{post.handle}</span><span className="text-[#b3bcb4]">·</span><span className="text-xs text-[#9aa59c]">{post.time} {t.minutes}</span></div><div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#89978c]"><span className="rounded-full bg-[#eef2eb] px-2 py-0.5 text-[#6f806d]">{post.circle}</span><span>·</span><span>{post.topic}</span></div></div>
-                      <button aria-label="More" className="rounded-lg p-1 text-[#a4ada5] hover:bg-[#f0f2ed] hover:text-[#607260]"><MoreHorizontal className="h-4 w-4" /></button>
+                      <div className="relative"><button onClick={(event) => { event.stopPropagation(); setOpenPostMenu((current) => current === post.id ? null : post.id); }} aria-label="خيارات المنشور" aria-expanded={openPostMenu === post.id} className="rounded-lg p-1 text-[#a4ada5] hover:bg-[#f0f2ed] hover:text-[#607260]"><MoreHorizontal className="h-4 w-4" /></button>{openPostMenu === post.id && <div className="absolute end-0 top-8 z-20 w-48 rounded-2xl border border-[#e2e5dc] bg-[#fcfbff] p-2 shadow-[0_16px_36px_rgba(68,55,126,0.15)]"><button onClick={() => openReportDialog(post.id)} disabled={isReported} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-start text-xs font-semibold text-[#a65e72] transition hover:bg-[#f9eaf0] disabled:cursor-not-allowed disabled:opacity-50"><Flag className="h-4 w-4" />{isReported ? "تم الإبلاغ" : "الإبلاغ عن المنشور"}</button></div>}</div>
                     </div>
                     <p className="mt-5 text-[15px] leading-8 text-[#4d5b52]">{post.body[locale] ?? post.body.en}</p>
                     {post.mediaUrl && <div className="mt-4 overflow-hidden rounded-[22px] border border-[#e0e6dc] bg-[#edf2e9]">{post.mediaType === "video" ? <video src={post.mediaUrl} controls className="max-h-[420px] w-full object-cover" /> : <img src={post.mediaUrl} alt="" className="max-h-[420px] w-full object-cover" />}</div>}
@@ -1671,12 +1695,9 @@ const Index = () => {
                       {isRevealed && <button onClick={() => toggleSensitivePost(post.id)} className="absolute end-3 top-3 inline-flex items-center gap-2 rounded-xl bg-[#fbfaf7]/90 px-3 py-2 text-xs font-bold text-[#59695c] shadow-sm backdrop-blur-sm"><EyeOff className="h-4 w-4" />{t.hideSensitive}</button>}
                     </div>}
                     <div className="mt-5 flex flex-wrap items-center gap-1 border-t border-[#edf0ea] pt-3 text-xs text-[#9aa59d]">
-                      <button onClick={() => toggleInsightful(post.id)} aria-pressed={isInsightful} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition ${isInsightful ? "bg-[#e3ecdf] text-[#587152]" : "hover:bg-[#edf3e9] hover:text-[#66805c]"}`}><Sparkles className={`h-4 w-4 ${isInsightful ? "fill-current" : ""}`} />{isInsightful ? t.insightfulDone : t.insightful}</button>
-                      <button className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition hover:bg-[#edf3e9] hover:text-[#66805c]"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</button>
-                      <button onClick={() => reportPost(post.id)} disabled={isReported} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition ${isReported ? "text-[#bd755e]" : "hover:bg-[#f6eae5] hover:text-[#b86e57]"}`}><Flag className={`h-4 w-4 ${isReported ? "fill-current" : ""}`} />{isReported ? t.reported : t.reportVulgar}</button>
-                      <button onClick={() => toggleLowValueSignal(post.id)} aria-pressed={hasLowValueSignal} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-start transition ${hasLowValueSignal ? "bg-[#f4e8d9] text-[#9a724d]" : "hover:bg-[#f5efe7] hover:text-[#9a724d]"}`}><Sparkles className={`h-4 w-4 ${hasLowValueSignal ? "fill-current" : ""}`} />{hasLowValueSignal ? t.signalSent : t.lowValueReport}</button>
-                      <button onClick={() => toggleValuesSignal(post.id)} aria-pressed={hasValuesSignal} className={`flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-start transition ${hasValuesSignal ? "bg-[#f6e2df] text-[#a25f57]" : "hover:bg-[#f8ecea] hover:text-[#a25f57]"}`}><ShieldAlert className={`h-4 w-4 ${hasValuesSignal ? "fill-current" : ""}`} />{hasValuesSignal ? t.signalSent : t.valuesReport}</button>
-                      <button onClick={() => toggleSaved(post.id)} className={`ms-auto rounded-lg p-2 transition hover:bg-[#edf3e9] ${isSaved ? "text-[#6b7f5a]" : "text-[#9aa59d] hover:text-[#66805c]"}`} aria-label={isSaved ? t.saved : t.save}><Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} /></button>
+                      <button onClick={(event) => { event.stopPropagation(); toggleLike(post.id); }} aria-pressed={isLiked} className={`flex items-center gap-1.5 rounded-xl px-2.5 py-2 transition ${isLiked ? "bg-[#fde7eb] text-[#dd4f68]" : "hover:bg-[#fdf0f2] hover:text-[#dd4f68]"}`}><Heart className={`h-4 w-4 transition ${isLiked ? "fill-current" : ""}`} />{isLiked ? t.liked : t.like}</button>
+                      <button onClick={(event) => event.stopPropagation()} className="flex items-center gap-1.5 rounded-xl px-2.5 py-2 transition hover:bg-[#eeebfa] hover:text-[#6656a7]"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</button>
+                      <button onClick={(event) => { event.stopPropagation(); toggleSaved(post.id); }} className={`ms-auto rounded-xl p-2 transition hover:bg-[#eeebfa] ${isSaved ? "text-[#5145a5]" : "text-[#9aa59d] hover:text-[#6656a7]"}`} aria-label={isSaved ? t.saved : t.save}><Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} /></button>
                     </div>
                   </article>;
                 })}
@@ -1686,6 +1707,14 @@ const Index = () => {
                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#e1ecdc] text-[#6b875f]"><Leaf className="h-5 w-5" /></div>
                 <h3 className="text-sm font-bold text-[#526b4d]">{t.noMore}</h3><p className="mt-1 max-w-xs text-xs leading-5 text-[#82927e]">{t.noMoreDesc}</p>
               </div>
+              {reportingPost !== null && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#29263d]/45 px-4 py-6" role="dialog" aria-modal="true" aria-labelledby="report-post-title">
+                <div className="w-full max-w-md rounded-[28px] border border-[#e2e0ef] bg-[#fcfbff] p-5 shadow-[0_24px_70px_rgba(38,31,75,0.22)] sm:p-6">
+                  <div className="flex items-start justify-between gap-4"><div><h2 id="report-post-title" className="text-lg font-bold text-[#3f3568]">الإبلاغ عن المنشور</h2><p className="mt-1 text-xs leading-5 text-[#827b98]">اختر السبب الأقرب لمساعدتنا على مراجعة المنشور.</p></div><button onClick={() => setReportingPost(null)} className="rounded-xl px-2 py-1 text-sm font-bold text-[#928ba6] hover:bg-[#eeebfa]" aria-label="إغلاق">×</button></div>
+                  <div className="mt-5 space-y-2">{reportReasons.map((reason) => <label key={reason} className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-3 py-3 text-sm font-semibold transition ${reportReason === reason ? "border-[#9c8ed0] bg-[#f0edfb] text-[#5145a5]" : "border-[#e6e2ef] text-[#665f7c] hover:bg-[#f8f7fd]"}`}><input type="radio" name="post-report-reason" value={reason} checked={reportReason === reason} onChange={(event) => setReportReason(event.target.value)} className="h-4 w-4 accent-[#5145a5]" />{reason}</label>)}</div>
+                  {reportMessage && <p className="mt-4 rounded-2xl bg-[#eeeafa] px-3 py-2.5 text-xs font-semibold leading-5 text-[#584a91]">{reportMessage}</p>}
+                  <div className="mt-5 flex items-center justify-end gap-2"><button onClick={() => setReportingPost(null)} className="rounded-xl px-4 py-2.5 text-xs font-bold text-[#817a98] hover:bg-[#f3f1f9]">إلغاء</button><button onClick={submitReport} disabled={!reportReason || reportSubmitting || (reportingPost !== null && reportedPosts.includes(reportingPost))} className="rounded-xl bg-[#5145a5] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#403583] disabled:cursor-not-allowed disabled:opacity-50">{reportSubmitting ? "جارٍ الإرسال…" : reportedPosts.includes(reportingPost) ? "تم الإبلاغ" : "إرسال البلاغ"}</button></div>
+                </div>
+              </div>}
             </section>
 
             <aside className="hidden space-y-5 xl:block">
