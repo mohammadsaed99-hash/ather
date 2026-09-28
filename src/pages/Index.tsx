@@ -1654,117 +1654,179 @@ const Index = () => {
                     </div>
                   </div>
                 </div>
-                {posted && <div className="mt-3 flex items-center gap-2 rounded-xl bg-[#edf5e9] px-3 py-2 text-xs font-semibold text-[#5d7955]"><CheckCircle2 className="h-4 w-4" /> {t.published}</div>}
+                                {posted && <div className="mt-3 flex items-center gap-2 rounded-xl bg-[#edf5e9] px-3 py-2 text-xs font-semibold text-[#5d7955]"><CheckCircle2 className="h-4 w-4" /> {t.published}</div>}
               </div>
 
-                             <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-sm font-bold text-[#536258]">
-                      {t.circlesTitle}
-                    </h2>
-                    <button className="text-xs font-semibold text-[#78906f] hover:text-[#4e6a48]">
-                      {t.seeAll}
-                    </button>
-                  </div>
+              {/* تبويبات */}
+              <div className="mt-6 flex flex-wrap items-center gap-2">
+                {([
+                  ["all", t.allFollowing],
+                  ["circles", t.myCircles],
+                  ["topics", t.myTopics],
+                ] as const).map(([key, label]) => (
+                  <button key={key} onClick={() => setActiveTab(key)} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${activeTab === key ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-[#f1f4ee]"}`}>{label}</button>
+                ))}
+                {activeTopic !== "الكل" && (
+                  <button onClick={() => setActiveTopic("الكل")} className="rounded-xl border border-[#dce5d9] px-3 py-2 text-xs font-semibold text-[#647762]">{activeTopic} ✕</button>
+                )}
+              </div>
 
-                  <div className="space-y-3">
-                    {[
-                      {
-                        name: "العائلة والأصدقاء",
-                        icon: "ع",
-                        tone: "bg-[#e8dfd5] text-[#8a6d52]",
-                      },
-                      {
-                        name: "المعارف والعمل",
-                        icon: "م",
-                        tone: "bg-[#dce7df] text-[#5b7965]",
-                      },
-                      {
-                        name: "عام",
-                        icon: "ع",
-                        tone: "bg-[#e0e5eb] text-[#647388]",
-                      },
-                    ].map((circle) => (
-                      <div
-                        key={circle.name}
-                        className="flex items-center gap-3"
-                      >
-                        <div
-                          className={`flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold ${circle.tone}`}
-                        >
-                          {circle.icon}
+              {/* المنشورات */}
+              <div className="mt-4 space-y-4">
+                {visiblePosts.map((post) => {
+                  const isLiked = likedPosts.includes(post.id);
+                  const isSaved = saved.includes(post.id);
+                  const isReported = reportedPosts.includes(post.id);
+                  const hidden = post.sensitive && !revealedPosts.includes(post.id);
+                  return (
+                    <article key={post.id} className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)]">
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-10 w-10 shrink-0"><AvatarFallback className={post.tone}>{post.initials}</AvatarFallback></Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 text-xs text-[#8b978e]">
+                            <span className="text-sm font-bold text-[#3d4b43]">{post.author}</span>
+                            <span>·</span><span>{post.circle}</span><span>·</span>
+                            <span>{/^\d+$/.test(post.time) ? `${post.time} ${t.minutes}` : post.time}</span>
+                          </div>
+                          <button onClick={() => setActiveTopic(post.topic)} className="mt-1 text-[11px] font-semibold text-[#78906f]">#{post.topic}</button>
                         </div>
-
-                        <span className="text-xs font-medium text-[#718077]">
-                          {circle.name}
-                        </span>
-
-                        <span className="ms-auto h-1.5 w-1.5 rounded-full bg-[#a9b9a3]" />
+                        <div className="relative">
+                          <button onClick={() => setOpenPostMenu(openPostMenu === post.id ? null : post.id)} aria-label="More" className="rounded-full p-1.5 text-[#8b978e] hover:bg-[#edf0e8]"><MoreHorizontal className="h-4 w-4" /></button>
+                          {openPostMenu === post.id && (
+                            <div className="absolute end-0 top-9 z-10 w-48 rounded-2xl border border-[#e2e5dc] bg-white p-2 shadow-lg">
+                              <button onClick={() => openReportDialog(post.id)} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs text-[#a65e52] hover:bg-[#fff4f1]"><Flag className="h-3.5 w-3.5" />{t.reportVulgar}</button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
 
-                <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-sm font-bold text-[#536258]">
-                      {t.topicsTitle}
-                    </h2>
-                    <Compass className="h-4 w-4 text-[#93a394]" />
-                  </div>
+                      <p className="mt-4 text-sm leading-7 text-[#3d4b43]">{post.body[locale] ?? post.body.en ?? post.body.ar}</p>
 
-                  <div className="flex flex-wrap gap-2">
-                    {topics.map((topic) => {
-                      const isFollowed = followedTopics.includes(topic);
+                      {post.mediaUrl ? (
+                        <div className="mt-4 overflow-hidden rounded-2xl">
+                          {post.mediaType === "video"
+                            ? <video src={post.mediaUrl} controls className={`max-h-[420px] w-full ${hidden ? "blur-2xl" : ""}`} />
+                            : <img src={post.mediaUrl} alt="" className={`max-h-[420px] w-full object-cover ${hidden ? "blur-2xl" : ""}`} />}
+                        </div>
+                      ) : post.topic === "تصوير" ? (
+                        <div className={`mt-4 h-44 rounded-2xl ${post.imageTone} ${hidden ? "blur-xl" : ""}`} />
+                      ) : null}
 
-                      return (
-                        <button
-                          key={topic}
-                          onClick={() => toggleTopic(topic)}
-                          className={`rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition ${
-                            isFollowed
-                              ? "border-[#d1dfcc] bg-[#edf3e9] text-[#63805d]"
-                              : "border-[#e6e8e2] text-[#97a29a] hover:border-[#cad9c6]"
-                          }`}
-                        >
-                          {isFollowed ? "✓ " : "+ "}
-                          {topic}
+                      {post.sensitive && (
+                        <div className="mt-3 flex items-center justify-between rounded-xl bg-[#f6efe4] px-3 py-2 text-xs font-semibold text-[#967b5d]">
+                          <span className="flex items-center gap-2"><ShieldAlert className="h-4 w-4" />{t.sensitiveNotice}</span>
+                          <button onClick={() => toggleSensitivePost(post.id)} className="flex items-center gap-1">
+                            {hidden ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                            {hidden ? t.showSensitive : t.hideSensitive}
+                          </button>
+                        </div>
+                      )}
+
+                      <div className="mt-4 flex items-center gap-1 border-t border-[#edf0ea] pt-3 text-xs text-[#8b978e]">
+                        <button onClick={() => toggleLike(post.id)} className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-[#f1f4ee] ${isLiked ? "text-[#c7795e]" : ""}`}>
+                          <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />{isLiked ? t.insightfulDone : t.insightful}
                         </button>
-                      );
-                    })}
+                        <span className="flex items-center gap-1.5 px-2.5 py-1.5"><MessageCircle className="h-4 w-4" />{post.replies} {t.replies}</span>
+                        <button onClick={() => toggleSaved(post.id)} className={`ms-auto flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-[#f1f4ee] ${isSaved ? "text-[#506c4a]" : ""}`}>
+                          <Bookmark className="h-4 w-4" fill={isSaved ? "currentColor" : "none"} />{isSaved ? t.saved : t.save}
+                        </button>
+                      </div>
+                      {isReported && <p className="mt-2 text-[11px] font-semibold text-[#78906f]">{t.reported}</p>}
+                    </article>
+                  );
+                })}
+              </div>
+
+              {/* نهاية الجديد */}
+              <div className="mt-8 rounded-[26px] border border-dashed border-[#cbd8c5] bg-[#f0f5ed] px-6 py-10 text-center">
+                <Leaf className="mx-auto mb-3 h-6 w-6 text-[#6b875f]" />
+                <p className="text-sm font-semibold text-[#526b4d]">{t.noMore}</p>
+                <p className="mt-1 text-xs text-[#7a8d77]">{t.noMoreDesc}</p>
+              </div>
+            </section>
+
+            <aside className="space-y-4">
+              <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-bold text-[#536258]">{t.circlesTitle}</h2>
+                  <button className="text-xs font-semibold text-[#78906f] hover:text-[#4e6a48]">{t.seeAll}</button>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { name: "العائلة والأصدقاء", icon: "ع", tone: "bg-[#e8dfd5] text-[#8a6d52]" },
+                    { name: "المعارف والعمل", icon: "م", tone: "bg-[#dce7df] text-[#5b7965]" },
+                    { name: "عام", icon: "ع", tone: "bg-[#e0e5eb] text-[#647388]" },
+                  ].map((circle) => (
+                    <div key={circle.name} className="flex items-center gap-3">
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold ${circle.tone}`}>{circle.icon}</div>
+                      <span className="text-xs font-medium text-[#718077]">{circle.name}</span>
+                      <span className="ms-auto h-1.5 w-1.5 rounded-full bg-[#a9b9a3]" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-bold text-[#536258]">{t.topicsTitle}</h2>
+                  <Compass className="h-4 w-4 text-[#93a394]" />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {topics.map((topic) => {
+                    const isFollowed = followedTopics.includes(topic);
+                    return (
+                      <button key={topic} onClick={() => toggleTopic(topic)} className={`rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition ${isFollowed ? "border-[#d1dfcc] bg-[#edf3e9] text-[#63805d]" : "border-[#e6e8e2] text-[#97a29a] hover:border-[#cad9c6]"}`}>
+                        {isFollowed ? "✓ " : "+ "}{topic}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="rounded-[26px] border border-[#dbe5d7] bg-[#eef4eb] p-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#dce9d8] text-[#698361]"><ShieldCheck className="h-4 w-4" /></div>
+                  <div>
+                    <h2 className="text-sm font-bold text-[#526b4d]">{t.qualityGate}</h2>
+                    <p className="mt-1 text-xs leading-5 text-[#7a8d77]">{t.qualityGateDesc}</p>
                   </div>
                 </div>
-
-                <div className="rounded-[26px] border border-[#dbe5d7] bg-[#eef4eb] p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#dce9d8] text-[#698361]">
-                      <ShieldCheck className="h-4 w-4" />
-                    </div>
-
-                    <div>
-                      <h2 className="text-sm font-bold text-[#526b4d]">
-                        {t.qualityGate}
-                      </h2>
-
-                      <p className="mt-1 text-xs leading-5 text-[#7a8d77]">
-                        {t.qualityGateDesc}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between text-[10px] font-semibold text-[#78906f]">
-                    <span>{t.meaningfulOnly}</span>
-                    <span>84%</span>
-                  </div>
-
-                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#d7e4d3]">
-                    <div className="h-full w-[84%] rounded-full bg-[#789870]" />
-                  </div>
-                </div>
+                <div className="mt-4 flex items-center justify-between text-[10px] font-semibold text-[#78906f]"><span>{t.meaningfulOnly}</span><span>84%</span></div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#d7e4d3]"><div className="h-full w-[84%] rounded-full bg-[#789870]" /></div>
               </div>
             </aside>
-          </div>
+          </div>}
         </main>
+
+        {/* نافذة البلاغ */}
+        {reportingPost !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4" onClick={() => setReportingPost(null)}>
+            <div className="w-full max-w-sm rounded-[24px] bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+              <h3 className="mb-3 text-sm font-bold text-[#3d4b43]">{t.reportVulgar}</h3>
+              {reportMessage ? (
+                <>
+                  <p className="text-xs leading-6 text-[#5d7955]">{reportMessage}</p>
+                  <Button size="sm" onClick={() => setReportingPost(null)} className="mt-4 w-full rounded-xl bg-[#6b7f5a] text-white">{t.close}</Button>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-1">
+                    {reportReasons.map((reason) => (
+                      <label key={reason} className={`flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-xs ${reportReason === reason ? "bg-[#edf3e9] font-semibold text-[#506c4a]" : "text-[#718078] hover:bg-[#f5f7f3]"}`}>
+                        <input type="radio" name="report" checked={reportReason === reason} onChange={() => setReportReason(reason)} />
+                        {reason}
+                      </label>
+                    ))}
+                  </div>
+                  <div className="mt-4 flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setReportingPost(null)} className="flex-1 rounded-xl">{t.close}</Button>
+                    <Button size="sm" onClick={submitReport} disabled={!reportReason || reportSubmitting} className="flex-1 rounded-xl bg-[#c7795e] text-white">{reportSubmitting ? "…" : t.reportVulgar}</Button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
