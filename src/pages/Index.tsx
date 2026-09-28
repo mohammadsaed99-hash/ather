@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "@supabase/auth-helpers-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -1057,6 +1058,7 @@ type PostId = string | number;
 
 type FeedPost = {
   id: PostId;
+  authorId?: string;
   sensitive: boolean;
   author: string;
   handle: string;
@@ -1366,6 +1368,7 @@ const Index = () => {
           : { data: null };
         return {
           id: item.id,
+          authorId: item.author_id,
           sensitive: Boolean(item.is_blurred),
           author: "عضو في أَثَر",
           handle: "athar_member",
@@ -1648,7 +1651,7 @@ const Index = () => {
                   return <article key={post.id} className="post-card rounded-[26px] border border-[#e2e5dc] bg-[#fbfaf7] p-5 shadow-[0_5px_24px_rgba(68,80,69,0.035)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(68,80,69,0.07)] sm:p-6">
                     <div className="flex items-start gap-3">
                       <Avatar className={`h-10 w-10 shrink-0 ${post.tone}`}><AvatarFallback className={post.tone}>{post.initials}</AvatarFallback></Avatar>
-                      <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="text-sm font-bold text-[#3d4b43]">{post.author}</span><span className="text-xs text-[#9aa59c]">@{post.handle}</span><span className="text-[#b3bcb4]">·</span><span className="text-xs text-[#9aa59c]">{post.time} {t.minutes}</span></div><div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#89978c]"><span className="rounded-full bg-[#eef2eb] px-2 py-0.5 text-[#6f806d]">{post.circle}</span><span>·</span><span>{post.topic}</span></div></div>
+                      <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-x-2 gap-y-1">{post.authorId ? <Link to={`/profile/${post.authorId}`} className="text-sm font-bold text-[#3d4b43] transition hover:text-[#5145a5]">{post.author}</Link> : <span className="text-sm font-bold text-[#3d4b43]">{post.author}</span>}<span className="text-xs text-[#9aa59c]">@{post.handle}</span><span className="text-[#b3bcb4]">·</span><span className="text-xs text-[#9aa59c]">{post.time} {t.minutes}</span></div><div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#89978c]"><span className="rounded-full bg-[#eef2eb] px-2 py-0.5 text-[#6f806d]">{post.circle}</span><span>·</span><span>{post.topic}</span></div></div>
                       <button aria-label="More" className="rounded-lg p-1 text-[#a4ada5] hover:bg-[#f0f2ed] hover:text-[#607260]"><MoreHorizontal className="h-4 w-4" /></button>
                     </div>
                     <p className="mt-5 text-[15px] leading-8 text-[#4d5b52]">{post.body[locale] ?? post.body.en}</p>

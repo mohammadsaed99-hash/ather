@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Preview from "./pages/Preview";
+import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
           <Routes>
             <Route path="/preview" element={<Preview />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/profile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/complete-profile" element={<ProtectedRoute><CompleteProfile /></ProtectedRoute>} />
             <Route path="/" element={<ProtectedRoute><ProfileGate><Index /></ProfileGate></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
