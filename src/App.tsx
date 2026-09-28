@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import "./App.css";
 import { SessionContextProvider, useSessionContext } from "@supabase/auth-helpers-react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";

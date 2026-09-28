@@ -2,8 +2,8 @@
 
 :root {
   font-family: "DM Sans", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
-  color: #28342f;
-  background: #f5f3ee;
+  color: #29263d;
+  background: #f4f2fa;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -23,7 +23,7 @@ button { cursor: pointer; }
   content: "";
   position: absolute;
   inset: -5px;
-  border: 1px solid rgba(107, 127, 90, .18);
+  border: 1px solid rgba(81, 69, 165, .24);
   border-radius: 21px;
   transform: rotate(8deg);
 }
@@ -35,7 +35,7 @@ button { cursor: pointer; }
   bottom: -50px;
   height: 110px;
   width: 110px;
-  border: 1px solid rgba(134, 159, 125, .2);
+  border: 1px solid rgba(117, 103, 190, .22);
   border-radius: 999px;
 }
 
@@ -47,9 +47,55 @@ button { cursor: pointer; }
   bottom: -50px;
   height: 160px;
   width: 160px;
-  border: 1px solid rgba(185, 150, 112, .18);
+  border: 1px solid rgba(151, 126, 185, .2);
   border-radius: 999px;
 }
+
+/* Keep the existing component markup on the new indigo-violet brand palette. */
+[class*="bg-[#6b7f5a]"] { background-color: #5145a5 !important; }
+[class*="bg-[#587047]"] { background-color: #403583 !important; }
+[class*="bg-[#f5f3ee]"] { background-color: #f4f2fa !important; }
+[class*="bg-[#f9f8f4]"] { background-color: #faf9fe !important; }
+[class*="bg-[#fbfaf7]"] { background-color: #fcfbff !important; }
+[class*="bg-[#f8faf5]"] { background-color: #f8f7fd !important; }
+[class*="bg-[#e7eee2]"] { background-color: #ebe8f8 !important; }
+[class*="bg-[#f0f5ed]"] { background-color: #efedfa !important; }
+[class*="bg-[#edf3e9]"] { background-color: #eeebfa !important; }
+[class*="bg-[#e3ecdf]"] { background-color: #e7e3f7 !important; }
+[class*="bg-[#eaf1e7]"] { background-color: #eeebfa !important; }
+[class*="bg-[#e1ecdc]"] { background-color: #e5e1f6 !important; }
+[class*="bg-[#dbe5d3]"] { background-color: #dedaf2 !important; }
+[class*="text-[#6b7f5a]"] { color: #5145a5 !important; }
+[class*="text-[#587047]"] { color: #403583 !important; }
+[class*="text-[#48623f]"] { color: #45368a !important; }
+[class*="text-[#4e6a48]"] { color: #51449a !important; }
+[class*="text-[#506c4a]"] { color: #55479b !important; }
+[class*="text-[#526b4d]"] { color: #584a91 !important; }
+[class*="text-[#66805c]"] { color: #6656a7 !important; }
+[class*="text-[#5f7859]"] { color: #6051a0 !important; }
+[class*="text-[#78906f]"] { color: #7568ad !important; }
+[class*="text-[#728570]"] { color: #756d98 !important; }
+[class*="text-[#28342f]"] { color: #29263d !important; }
+[class*="text-[#34463a]"] { color: #383052 !important; }
+[class*="text-[#354b3a]"] { color: #3f3568 !important; }
+[class*="border-[#6b7f5a]"] { border-color: #5145a5 !important; }
+[class*="border-[#dbe5d7]"] { border-color: #dcd7ef !important; }
+[class*="border-[#dfe5db]"] { border-color: #e1ddef !important; }
+[class*="border-[#e2e5dc]"] { border-color: #e4e0ef !important; }
+[class*="border-[#dce5d9]"] { border-color: #ddd8ee !important; }
+[class*="border-[#e3e6df]"] { border-color: #e5e1ef !important; }
+[class*="border-[#cbd8c5]"] { border-color: #c9c1e4 !important; }
+[class*="hover:bg-[#587047]"]:hover { background-color: #403583 !important; }
+[class*="hover:bg-[#edf3e9]"]:hover { background-color: #eeebfa !important; }
+[class*="hover:bg-[#eaf2e7]"]:hover { background-color: #eae6fa !important; }
+[class*="hover:text-[#66805c]"]:hover { color: #6656a7 !important; }
+[class*="bg-[#f5f9f2]"] { background-color: #f6f4fc !important; }
+[class*="bg-[#f4f8f1]"] { background-color: #f3f0fc !important; }
+[class*="bg-[#f4ede3]"] { background-color: #f1ecf7 !important; }
+[class*="bg-[#eadfce]"] { background-color: #e7def1 !important; }
+[class*="border-[#d6e2d2]"] { border-color: #ddd8ee !important; }
+[class*="border-[#dce6d8]"] { border-color: #ded8ef !important; }
+[class*="hover:border-[#b8cdb2]"]:hover { border-color: #bcb0df !important; }
 
 .post-card, .nav-item, .mindful-card { will-change: transform; }
 

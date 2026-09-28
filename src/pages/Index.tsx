@@ -45,6 +45,7 @@ type Copy = {
   nav: { home: string; explore: string; circles: string; saved: string; ads: string };
   greeting: string;
   title: string;
+  tagline: string;
   subtitle: string;
   timeline: string;
   timelineDesc: string;
@@ -122,6 +123,7 @@ const copy: Record<Locale, Copy> = {
     nav: { home: "الرئيسية", explore: "اكتشف", circles: "دوائري", saved: "المحفوظات", ads: "الإعلانات" },
     greeting: "صباح هادئ، ليان",
     title: "مساحتك الهادئة",
+    tagline: "اترك أثرًا، لا ضجيجًا.",
     subtitle: "كل ما تراه هنا اختاره وقتك، لا خوارزمية.",
     timeline: "التسلسل الزمني فقط",
     timelineDesc: "الأحدث أولاً. دون اقتراحات عشوائية أو تمرير لا ينتهي.",
@@ -197,6 +199,7 @@ const copy: Record<Locale, Copy> = {
     nav: { home: "Home", explore: "Explore", circles: "Circles", saved: "Saved", ads: "Ads" },
     greeting: "A quiet morning, Layan",
     title: "Your quiet space",
+    tagline: "Leave a trace, not noise.",
     subtitle: "Everything here arrives by time, never by an algorithm.",
     timeline: "Strictly chronological",
     timelineDesc: "Newest first. No random suggestions or endless scroll.",
@@ -272,6 +275,7 @@ const copy: Record<Locale, Copy> = {
     nav: { home: "Accueil", explore: "Découvrir", circles: "Cercles", saved: "Enregistrés", ads: "Annonces" },
     greeting: "Un matin calme, Layan",
     title: "Votre espace calme",
+    tagline: "Laissez une trace, pas du bruit.",
     subtitle: "Tout arrive ici par le temps, jamais par un algorithme.",
     timeline: "Chronologique, simplement",
     timelineDesc: "Le plus récent d'abord. Sans suggestions ni défilement infini.",
@@ -347,6 +351,7 @@ const copy: Record<Locale, Copy> = {
     nav: { home: "首页", explore: "探索", circles: "圈子", saved: "收藏", ads: "广告" },
     greeting: "早安，Layan",
     title: "你的宁静空间",
+    tagline: "留下痕迹，而非噪音。",
     subtitle: "这里的一切按时间到来，从不由算法决定。",
     timeline: "严格按时间排列",
     timelineDesc: "最新优先。没有随机推荐，也没有无限滚动。",
@@ -422,6 +427,7 @@ const copy: Record<Locale, Copy> = {
     nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados", ads: "Anuncios" },
     greeting: "Una mañana tranquila, Layan",
     title: "Tu espacio tranquilo",
+    tagline: "Deja huella, no ruido.",
     subtitle: "Todo llega aquí por el tiempo, nunca por un algoritmo.",
     timeline: "Solo cronológico",
     timelineDesc: "Lo más reciente primero. Sin sugerencias ni scroll infinito.",
@@ -497,6 +503,7 @@ const copy: Record<Locale, Copy> = {
     nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए", ads: "विज्ञापन" },
     greeting: "शांत सुबह, Layan",
     title: "आपकी शांत जगह",
+    tagline: "शोर नहीं, एक छाप छोड़ें।",
     subtitle: "यहाँ सब कुछ समय के अनुसार आता है, एल्गोरिदम के अनुसार नहीं।",
     timeline: "सिर्फ़ कालानुक्रमिक",
     timelineDesc: "नवीनतम पहले। बिना सुझाव या अंतहीन स्क्रॉल के।",
@@ -1047,6 +1054,7 @@ const Index = () => {
             <div>
               <div className="font-display text-[25px] font-semibold leading-none tracking-[-0.04em]">أَثَر</div>
               <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.26em] text-[#819087]">CHRONOS</div>
+              <div className="mt-2 max-w-[150px] text-[11px] font-semibold leading-4 text-[#7568ad]">{t.tagline}</div>
             </div>
           </div>
 
@@ -1110,6 +1118,7 @@ const Index = () => {
             <section className="min-w-0">
               <div className="mb-6 flex items-end justify-between gap-4">
                 <div>
+                  <p className="mb-2 text-xs font-bold tracking-[0.04em] text-[#7568ad]">{t.tagline}</p>
                   <p className="mb-2 text-sm font-medium text-[#91a094]">{t.greeting}</p>
                   <h1 className="font-display text-[clamp(2.25rem,5vw,3.45rem)] font-semibold leading-[1.08] tracking-[-0.055em] text-[#2e3b34]">{activeNav === "explore" ? t.nav.explore : activeNav === "circles" ? t.nav.circles : activeNav === "saved" ? t.nav.saved : t.title}</h1>
                   <p className="mt-3 max-w-lg text-sm leading-6 text-[#859189]">{t.subtitle}</p>

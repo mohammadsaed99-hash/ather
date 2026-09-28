@@ -54,9 +54,10 @@ const Login = () => {
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-5xl items-center gap-10 lg:grid-cols-[1fr_390px]">
         <section className="hidden rounded-[34px] border border-[#dbe5d7] bg-[#e7eee2] p-10 lg:block">
           <div className="flex h-12 w-12 items-center justify-center rounded-[17px] bg-[#6b7f5a] text-white shadow-[0_8px_20px_rgba(107,127,90,0.18)]"><Feather className="h-6 w-6" /></div>
-          <p className="mt-14 text-sm font-semibold text-[#78906f]">أَثَر · CHRONOS</p>
-          <h1 className="mt-4 max-w-md font-display text-5xl font-semibold leading-tight tracking-[-0.055em] text-[#354b3a]">مساحتك الهادئة، كما اخترتها.</h1>
-          <p className="mt-5 max-w-md text-sm leading-7 text-[#718570]">تواصل حقيقي، دوائر خاصة، ومواضيع عامة مرتبة بصدق وبدون ضجيج الخوارزميات.</p>
+          <p className="mt-14 text-sm font-semibold text-[#7568ad]">أَثَر · CHRONOS</p>
+          <p className="mt-4 text-base font-bold tracking-[0.02em] text-[#5145a5]">اترك أثرًا، لا ضجيجًا.</p>
+          <h1 className="mt-3 max-w-md font-display text-5xl font-semibold leading-tight tracking-[-0.055em] text-[#3f3568]">مساحتك الهادئة، كما اخترتها.</h1>
+          <p className="mt-5 max-w-md text-sm leading-7 text-[#756d98]">تواصل حقيقي، دوائر خاصة، ومواضيع عامة مرتبة بصدق وبدون ضجيج الخوارزميات.</p>
           <div className="mt-14 flex items-center gap-3 text-xs font-semibold text-[#68805f]"><Leaf className="h-4 w-4" /> لا أرقام للمتابعين · لا تمرير لا نهائي</div>
         </section>
 
@@ -72,7 +73,7 @@ const Login = () => {
 
           {mode === "signin" ? <>
             <div className="overflow-hidden rounded-2xl [&_button]:rounded-xl [&_input]:rounded-xl [&_input]:border-[#dfe5db] [&_label]:text-[#657565]">
-              <Auth supabaseClient={supabase} view="sign_in" showLinks={false} providers={[]} appearance={{ theme: ThemeSupa, variables: { default: { colors: { brand: "#6b7f5a", brandAccent: "#587047", inputBorder: "#dfe5db", inputBackground: "#fbfaf7" }, radii: { borderRadiusButton: "12px", inputBorderRadius: "12px" } } } }} theme="light" localization={{ variables: { sign_in: { email_label: "البريد الإلكتروني", password_label: "كلمة المرور", button_label: "دخول", loading_button_label: "جارٍ الدخول…", link_text: "" } } }} />
+              <Auth supabaseClient={supabase} view="sign_in" showLinks={false} providers={[]} appearance={{ theme: ThemeSupa, variables: { default: { colors: { brand: "#5145a5", brandAccent: "#403583", inputBorder: "#e1ddef", inputBackground: "#fcfbff" }, radii: { borderRadiusButton: "12px", inputBorderRadius: "12px" } } } }} theme="light" localization={{ variables: { sign_in: { email_label: "البريد الإلكتروني", password_label: "كلمة المرور", button_label: "دخول", loading_button_label: "جارٍ الدخول…", link_text: "" } } }} />
             </div>
             <button onClick={() => { setMode("signup"); setError(""); setSuccess(""); }} className="mt-5 w-full rounded-xl border border-[#dce6d8] bg-[#f4f8f1] px-4 py-3 text-sm font-bold text-[#587152] transition hover:bg-[#eaf2e7]">لا تملك حساباً؟ إنشاء حساب</button>
           </> : <form onSubmit={signUp} className="space-y-4">
