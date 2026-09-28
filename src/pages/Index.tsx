@@ -1743,6 +1743,10 @@ const Index = () => {
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#d7e4d3]"><div className="h-full w-[84%] rounded-full bg-[#789870]" /></div>
                 </div>
 
+                          </div>
+
+              </div>
+            </aside>
           </div>
         </main>
       </div>
