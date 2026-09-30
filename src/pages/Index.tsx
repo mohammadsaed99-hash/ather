@@ -1329,7 +1329,7 @@ const Index = () => {
   const [locale, setLocale] = useState<Locale>("ar");
   const [languageOpen, setLanguageOpen] = useState(false);
   const [activeNav, setActiveNav] = useState<NavKey>("home");
-  const [activeTab, setActiveTab] = useState<"all" | "circles" | "topics">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "circles" | "topics" | "saved">("all");
   const [activeTopic, setActiveTopic] = useState("الكل");
   const [composerScope, setComposerScope] = useState<"circle" | "topic">("circle");
   const [composerTopic, setComposerTopic] = useState(topics[0]);
@@ -1416,12 +1416,21 @@ const Index = () => {
   const allPosts = useMemo(() => [...localPosts, ...remotePosts, ...posts], [localPosts, remotePosts]);
 
   const visiblePosts = useMemo(() => {
-    const scopedPosts = activeTab === "circles" ? allPosts.filter((post) => post.circle !== "عام") : activeTab === "topics" ? allPosts.filter((post) => post.circle === "عام") : allPosts;
-    if (activeTopic !== "الكل" && activeTopic !== "All") {
-      return scopedPosts.filter((post) => post.topic === activeTopic);
-    }
-    return scopedPosts;
-  }, [activeTab, activeTopic, allPosts]);
+      let scopedPosts: FeedPost[] = [];
+      if (activeTab === "circles") {
+        scopedPosts = allPosts.filter((post) => post.circle !== "عام");
+      } else if (activeTab === "topics") {
+        scopedPosts = allPosts.filter((post) => post.circle === "عام");
+      } else if (activeTab === "saved") {
+        scopedPosts = allPosts.filter((post) => saved.includes(post.id));
+      } else {
+        scopedPosts = allPosts;
+      }
+      if (activeTopic !== "الكل" && activeTopic !== "All") {
+        return scopedPosts.filter((post) => post.topic === activeTopic);
+      }
+      return scopedPosts;
+    }, [activeTab, activeTopic, allPosts, saved]);
 
   const toggleLike = (id: PostId) => {
     setLikedPosts((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
@@ -1711,6 +1720,7 @@ const Index = () => {
                   ["all", t.allFollowing],
                   ["circles", t.myCircles],
                   ["topics", t.myTopics],
+                  ["saved", t.saved],
                 ] as const).map(([key, label]) => (
                   <button key={key} onClick={() => setActiveTab(key)} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${activeTab === key ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-[#f1f4ee]"}`}>{label}</button>
                 ))}
