@@ -1460,80 +1460,95 @@ const Index = () => {
   };
 
   const publish = async () => {
-    const content = draft.trim();
-    if (!content || !session?.user.id || saving) return;
-    if (composerScope === "topic" && content.length < 24) {
-      setPublishError(true);
-      return;
-    }
-    if (composerScope === "circle" && !selectedCircleId) {
-      setBackendError(t.noCircle);
-      return;
-    }
-
-    setPublishError(false);
-    setBackendError("");
-    setSaving(true);
-    let mediaPath: string | null = null;
-
-    try {
-      if (mediaFile) {
-        const extension = mediaFile.name.split(".").pop()?.toLowerCase() || "bin";
-        mediaPath = `${session.user.id}/${crypto.randomUUID()}.${extension}`;
-        const { error: uploadError } = await supabase.storage.from("athar-media").upload(mediaPath, mediaFile, {
-          contentType: mediaFile.type,
-          upsert: false,
-        });
-        if (uploadError) throw uploadError;
+      console.log("PUBLISH START");
+      const content = draft.trim();
+      if (!content) {
+        console.log("EARLY RETURN: EMPTY CONTENT");
+        return;
       }
-
-      const visibility = composerScope === "circle" ? "circle" : "topic";
-      const { data: createdPost, error: insertError } = await supabase.from("posts").insert({
-        author_id: session.user.id,
-        circle_id: composerScope === "circle" ? selectedCircleId : null,
-        topic_tag: composerTopic,
-        content,
-        media_url: mediaPath,
-        visibility,
-        moderation_status: visibility === "topic" ? "pending" : "approved",
-        is_blurred: false,
-      }).select("id, topic_tag, content, media_url, created_at, visibility, is_blurred").single();
-
-      if (insertError || !createdPost) throw insertError ?? new Error("Post was not created");
-      const { data: signedMedia } = createdPost.media_url
-        ? await supabase.storage.from("athar-media").createSignedUrl(createdPost.media_url, 3600)
-        : { data: null };
-      const localPost: FeedPost = {
-        id: createdPost.id,
-        sensitive: Boolean(createdPost.is_blurred),
-        author: "أنت",
-        handle: "you",
-        initials: "ل",
-        tone: "bg-[#eadfd4] text-[#886d53]",
-        circle: visibility === "circle" ? (userCircles.find((circle) => circle.id === selectedCircleId)?.name ?? "دائرة خاصة") : "عام",
-        time: t.justNow,
-        topic: createdPost.topic_tag || composerTopic,
-        imageTone: "bg-[#edf2e9]",
-        mediaUrl: signedMedia?.signedUrl,
-        mediaType: mediaFile?.type.startsWith("video/") ? "video" : "image",
-        body: { ar: content, en: content, fr: content, zh: content, es: content, hi: content },
-        likes: 0,
-        replies: 0,
-        visibility,
-      };
-      setLocalPosts((current) => [localPost, ...current]);
-      setDraft("");
-      setMediaFile(null);
-      if (mediaInputRef.current) mediaInputRef.current.value = "";
-      setPosted(true);
-      window.setTimeout(() => setPosted(false), 2800);
-    } catch {
-      if (mediaPath) await supabase.storage.from("athar-media").remove([mediaPath]);
-      setBackendError(t.saveFailed);
-    } finally {
-      setSaving(false);
-    }
-  };
+      if (!session?.user.id) {
+        console.log("EARLY RETURN: NO SESSION");
+        return;
+      }
+      if (saving) {
+        console.log("EARLY RETURN: SAVING");
+        return;
+      }
+      if (composerScope === "topic" && content.length < 24) {
+        console.log("EARLY RETURN: TOPIC TOO SHORT");
+        setPublishError(true);
+        return;
+      }
+      if (composerScope === "circle" && !selectedCircleId) {
+        console.log("EARLY RETURN: NO CIRCLE");
+        setBackendError(t.noCircle);
+        return;
+      }
+  
+      console.log("REACHED POSTS INSERT");
+      setPublishError(false);
+      setBackendError("");
+      setSaving(true);
+      let mediaPath: string | null = null;
+  
+      try {
+        if (mediaFile) {
+          const extension = mediaFile.name.split(".").pop()?.toLowerCase() || "bin";
+          mediaPath = `${session.user.id}/${crypto.randomUUID()}.${extension}`;
+          const { error: uploadError } = await supabase.storage.from("athar-media").upload(mediaPath, mediaFile, {
+            contentType: mediaFile.type,
+            upsert: false,
+          });
+          if (uploadError) throw uploadError;
+        }
+  
+        const visibility = composerScope === "circle" ? "circle" : "topic";
+        const { data: createdPost, error: insertError } = await supabase.from("posts").insert({
+          author_id: session.user.id,
+          circle_id: composerScope === "circle" ? selectedCircleId : null,
+          topic_tag: composerTopic,
+          content,
+          media_url: mediaPath,
+          visibility,
+          moderation_status: visibility === "topic" ? "pending" : "approved",
+          is_blurred: false,
+        }).select("id, topic_tag, content, media_url, created_at, visibility, is_blurred").single();
+  
+        if (insertError || !createdPost) throw insertError ?? new Error("Post was not created");
+        const { data: signedMedia } = createdPost.media_url
+          ? await supabase.storage.from("athar-media").createSignedUrl(createdPost.media_url, 3600)
+          : { data: null };
+        const localPost: FeedPost = {
+          id: createdPost.id,
+          sensitive: Boolean(createdPost.is_blurred),
+          author: "أنت",
+          handle: "you",
+          initials: "ل",
+          tone: "bg-[#eadfd4] text-[#886d53]",
+          circle: visibility === "circle" ? (userCircles.find((circle) => circle.id === selectedCircleId)?.name ?? "دائرة خاصة") : "عام",
+          time: t.justNow,
+          topic: createdPost.topic_tag || composerTopic,
+          imageTone: "bg-[#edf2e9]",
+          mediaUrl: signedMedia?.signedUrl,
+          mediaType: mediaFile?.type.startsWith("video/") ? "video" : "image",
+          body: { ar: content, en: content, fr: content, zh: content, es: content, hi: content },
+          likes: 0,
+          replies: 0,
+          visibility,
+        };
+        setLocalPosts((current) => [localPost, ...current]);
+        setDraft("");
+        setMediaFile(null);
+        if (mediaInputRef.current) mediaInputRef.current.value = "";
+        setPosted(true);
+        window.setTimeout(() => setPosted(false), 2800);
+      } catch {
+        if (mediaPath) await supabase.storage.from("athar-media").remove([mediaPath]);
+        setBackendError(t.saveFailed);
+      } finally {
+        setSaving(false);
+      }
+    };
 
   const getNavLabel = (key: NavKey) => t.nav[key];
 
