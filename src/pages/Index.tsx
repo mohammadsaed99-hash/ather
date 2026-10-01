@@ -1259,7 +1259,7 @@ const navItems: { key: NavKey; icon: typeof Home }[] = [
   { key: "ads", icon: Megaphone },
 ];
 
-const AdsPanel = ({ locale, t }: { locale: Locale; t: Copy }) => {
+const AdsPanel = ({ locale, t, setActiveNav }: { locale: Locale; t: Copy; setActiveNav: (key: NavKey) => void }) => {
   const [category, setCategory] = useState<AdCategoryKey>("all");
   const [locationStatus, setLocationStatus] = useState<"idle" | "loading" | "enabled" | "denied">("idle");
   const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
@@ -1665,7 +1665,7 @@ const Index = () => {
             </div>
           </header>
 
-          {activeNav === "ads" ? <AdsPanel locale={locale} t={t} /> : <div className="mx-auto grid max-w-[1030px] gap-7 xl:grid-cols-[minmax(0,1fr)_286px]">
+          {activeNav === "ads" ? <AdsPanel locale={locale} t={t} setActiveNav={setActiveNav} /> : <div className="mx-auto grid max-w-[1030px] gap-7 xl:grid-cols-[minmax(0,1fr)_286px]">
             <section className="min-w-0">
               <div className="mb-6 flex items-end justify-between gap-4">
                 <div>
