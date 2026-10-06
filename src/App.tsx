@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Preview from "./pages/Preview";
+import Settings from "./pages/Settings";
 import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
@@ -47,7 +48,7 @@ const ProfileGate = ({ children }: { children: ReactNode }) => {
 
   if (isLoading || state === "loading") return <LoadingScreen />;
   if (state === "missing") return <Navigate to="/complete-profile" replace />;
-  if (state === "error") return <div className="flex min-h-screen items-center justify-center bg-[#f5f3ee] px-6 text-center text-sm font-semibold text-[#a65e52]">تعذر تحميل ملفك الخاص. حاول تحديث الصفحة.</div>;
+  if (state === "error") return <div className="flex min-h-screen items-center justify-center bg-[#f5f3ee] px-6 text-center text-sm font-semibold text-[#a65e52]">تعذر تحميل Beyoncé. حاول(px).</div>;
   return children;
 };
 
@@ -63,6 +64,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/profile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/complete-profile" element={<ProtectedRoute><CompleteProfile /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><ProfileGate><Settings /></ProfileGate></ProtectedRoute>} />
             <Route path="/" element={<ProtectedRoute><ProfileGate><Index /></ProfileGate></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
