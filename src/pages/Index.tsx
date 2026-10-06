@@ -36,6 +36,7 @@ import {
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
+  Paperclip,
   Trash2,
   UsersRound,
 } from "lucide-react";
@@ -1336,6 +1337,7 @@ const Index = () => {
   const [selectedCircleId, setSelectedCircleId] = useState("");
   const [draft, setDraft] = useState("");
   const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaUrlPreview, setMediaUrlPreview] = useState("");
   const [remotePosts, setRemotePosts] = useState<FeedPost[]>([]);
   const [localPosts, setLocalPosts] = useState<FeedPost[]>([]);
   const [userCircles, setUserCircles] = useState<UserCircle[]>([]);
@@ -1362,6 +1364,14 @@ const Index = () => {
     document.documentElement.dir = isRtl ? "rtl" : "ltr";
     document.title = `أَثَر · ${t.title}`;
   }, [isRtl, locale, t.title]);
+
+  useEffect(() => {
+    if (mediaFile) {
+      setMediaUrlPreview(URL.createObjectURL(mediaFile));
+    } else {
+      setMediaUrlPreview("");
+    }
+  }, [mediaFile]);
 
   useEffect(() => {
     if (!session?.user.id) return;
@@ -1706,9 +1716,52 @@ const Index = () => {
                     {publishError && <div className="mb-3 rounded-xl bg-[#f8e9e5] px-3 py-2 text-xs font-semibold leading-5 text-[#a65e52]">{t.qualityError}</div>}
                     {backendError && <div className="mb-3 rounded-xl bg-[#f8e9e5] px-3 py-2 text-xs font-semibold leading-5 text-[#a65e52]">{backendError}</div>}
                     <div className="flex items-center justify-between border-t border-[#edf0ea] pt-3">
-                      <div className="flex min-w-0 items-center gap-2 text-xs text-[#93a096]"><label className="shrink-0 cursor-pointer rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]" title={t.uploadMedia}><Plus className="h-4 w-4" /><input ref={mediaInputRef} type="file" accept="image/*,video/*" className="sr-only" onChange={(event) => setMediaFile(event.target.files?.[0] ?? null)} /></label><span className="truncate">{mediaFile ? `${t.mediaSelected}: ${mediaFile.name}` : composerScope === "circle" ? t.privateCircle : `${t.publicTopic} · ${composerTopic}`}</span></div>
+                      <div className="flex min-w-0 items-center gap-2 text-xs text-[#93a096]">
+                        <label className="shrink-0 cursor-pointer rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]" title={t.uploadMedia}>
+                          <Paperclip className="h-4 w-4" />
+                          <input
+                            ref={mediaInputRef}
+                            type="file"
+                            accept="image/*,video/*"
+                            className="sr-only"
+                            onChange={(event) => setMediaFile(event.target.files?.[0] ?? null)}
+                          />
+                        </label>
+                        <span className="truncate">{mediaFile ? t.mediaSelected : composerScope === "circle" ? t.privateCircle : `${t.publicTopic} · ${composerTopic}`}</span>
+                      </div>
                       <Button onClick={publish} disabled={saving} size="sm" className="rounded-xl bg-[#6b7f5a] px-4 text-xs font-semibold text-white shadow-[0_5px_12px_rgba(107,127,90,0.18)] hover:bg-[#587047]">{saving ? "…" : t.publish}<Send className="h-3.5 w-3.5" /></Button>
                     </div>
+                    {mediaFile && (
+                      <div className="mt-3 relative rounded-2xl border border-[#dce5d9] bg-[#fbfaf7] p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="shrink-0 overflow-hidden rounded-xl border border-[#e2e5dc]">
+                            {mediaFile.type.startsWith("video/") ? (
+                              <video src={mediaUrlPreview} controls className="max-h-40 w-full object-cover" />
+                            ) : (
+                              <img src={mediaUrlPreview} alt="" className="max-h-40 w-full object-cover" />
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="break-all text-xs font-semibold text-[#3d4b43]">{mediaFile.name}</p>
+                            <p className="mt-0.5 text-[10px] text-[#8b978e]">
+                              {Math.round(mediaFile.size / 1024)} KB · {mediaFile.type}
+                            </p>
+                          </div>
+                          <div className="shrink-0">
+                            <button
+                              onClick={() => {
+                                setMediaFile(null);
+                                if (mediaUrlPreview) URL.revokeObjectURL(mediaUrlPreview);
+                                setMediaUrlPreview("");
+                              }}
+                              className="flex items-center gap-1 rounded-xl bg-[#f8e9e5] px-3 py-2 text-xs font-semibold text-[#a65e52] hover:bg-[#f5dcd8]"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" /> إزالة
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
                                 {posted && <div className="mt-3 flex items-center gap-2 rounded-xl bg-[#edf5e9] px-3 py-2 text-xs font-semibold text-[#5d7955]"><CheckCircle2 className="h-4 w-4" /> {t.published}</div>}
