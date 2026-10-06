@@ -48,7 +48,7 @@ const ProfileGate = ({ children }: { children: ReactNode }) => {
 
   if (isLoading || state === "loading") return <LoadingScreen />;
   if (state === "missing") return <Navigate to="/complete-profile" replace />;
-  if (state === "error") return <div className="flex min-h-screen items-center justify-center bg-[#f5f3ee] px-6 text-center text-sm font-semibold text-[#a65e52]">تعذر تحميل Beyoncé. حاول(px).</div>;
+  if (state === "error") return <div className="flex min-h-screen items-center justify-center bg-[#f5f3ee] px-6 text-center text-sm font-semibold text-[#a65e52]">تعذر تحميل ملفك الخاص. حاول تحديث الصفحة.</div>;
   return children;
 };
 
