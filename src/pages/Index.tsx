@@ -28,7 +28,6 @@ import {
   MessageCircle,
   MoreHorizontal,
   Navigation,
-  Paperclip,
   Plus,
   Search,
   Send,
@@ -39,7 +38,6 @@ import {
   Sparkles,
   Trash2,
   UsersRound,
-  X,
 } from "lucide-react";
 import "../App.css";
 
@@ -1328,7 +1326,6 @@ const AdsPanel = ({ locale, t, setActiveNav }: { locale: Locale; t: Copy; setAct
 const Index = () => {
   const session = useSession();
   const mediaInputRef = useRef<HTMLInputElement>(null);
-  const replaceMediaInputRef = useRef<HTMLInputElement>(null);
   const [locale, setLocale] = useState<Locale>("ar");
   const [languageOpen, setLanguageOpen] = useState(false);
   const [activeNav, setActiveNav] = useState<NavKey>("home");
@@ -1624,10 +1621,6 @@ const Index = () => {
                 {key === "home" && <span className="ms-auto h-1.5 w-1.5 rounded-full bg-[#6b7f5a]" />}
               </button>
             ))}
-            <Link to="/settings" className="nav-item flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-[#7a877f] hover:bg-[#eef1ea] hover:text-[#4d5f53] transition">
-              <Settings2 className="h-[18px] w-[18px]" strokeWidth={1.8} />
-              <span>{locale === "ar" || locale === "ur" ? "الإعدادات" : "Settings"}</span>
-            </Link>
           </div>
 
           <div className="mt-auto rounded-[24px] border border-[#e4e6dd] bg-[#f2f5ed] p-4">
