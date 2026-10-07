@@ -38,6 +38,7 @@ import {
   Sparkles,
   Trash2,
   UsersRound,
+  X,
 } from "lucide-react";
 import "../App.css";
 
@@ -120,6 +121,7 @@ type Copy = {
   noCircle: string;
   saveFailed: string;
   feedError: string;
+  deletePost: string;
 };
 
 const copy: Record<BaseLocale, Copy> = {
@@ -429,6 +431,7 @@ const copy: Record<BaseLocale, Copy> = {
     noCircle: "还没有私人圈子。请选择公共主题或先创建圈子。",
     saveFailed: "无法保存动态，请重试。",
     feedError: "无法加载新动态。",
+    deletePost: "删除帖子",
   },
   es: {
     nav: { home: "Inicio", explore: "Explorar", circles: "Círculos", saved: "Guardados", ads: "Anuncios" },
@@ -501,11 +504,12 @@ const copy: Record<BaseLocale, Copy> = {
     topicLabel: "Tema",
     meaningfulOnly: "Solo contenido con sentido",
     uploadMedia: "Añadir imagen o vídeo",
-    mediaSelected: "Archivo seleccionado",
-    noCircle: "Aún no tienes un círculo privado. Elige un tema público o crea uno primero.",
-    saveFailed: "No se pudo guardar la publicación.",
-    feedError: "No se pudieron cargar las publicaciones nuevas.",
-  },
+        mediaSelected: "Archivo seleccionado",
+        noCircle: "Aún no tienes un círculo privado. Elige un tema público o crea uno primero.",
+        saveFailed: "No se pudo guardar la publicación.",
+        feedError: "No se pudieron cargar las publicaciones nuevas.",
+        deletePost: "Suprimir publicación",
+      },
   hi: {
     nav: { home: "होम", explore: "खोजें", circles: "सर्कल", saved: "सहेजे गए", ads: "विज्ञापन" },
     greeting: "शांत सुबह, Layan",
@@ -581,6 +585,7 @@ const copy: Record<BaseLocale, Copy> = {
     noCircle: "अभी कोई निजी सर्कल नहीं है। सार्वजनिक विषय चुनें या पहले सर्कल बनाएँ।",
     saveFailed: "पोस्ट सहेजी नहीं जा सकी। फिर कोशिश करें।",
     feedError: "नई पोस्ट लोड नहीं हो सकीं।",
+    deletePost: "पोस्ट हटाएँ",
   },
 };
 
@@ -1327,41 +1332,68 @@ const Index = () => {
   const session = useSession();
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const [locale, setLocale] = useState<Locale>("ar");
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const [activeNav, setActiveNav] = useState<NavKey>("home");
-  const [activeTab, setActiveTab] = useState<"all" | "circles" | "topics" | "saved">("all");
-  const [activeTopic, setActiveTopic] = useState("الكل");
-  const [composerScope, setComposerScope] = useState<"circle" | "topic">("circle");
-  const [composerTopic, setComposerTopic] = useState(topics[0]);
-  const [selectedCircleId, setSelectedCircleId] = useState("");
-  const [draft, setDraft] = useState("");
-  const [mediaFile, setMediaFile] = useState<File | null>(null);
-  const [remotePosts, setRemotePosts] = useState<FeedPost[]>([]);
-  const [localPosts, setLocalPosts] = useState<FeedPost[]>([]);
-  const [userCircles, setUserCircles] = useState<UserCircle[]>([]);
-  const [publishError, setPublishError] = useState(false);
-  const [backendError, setBackendError] = useState("");
-  const [feedError, setFeedError] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [posted, setPosted] = useState(false);
-  const [likedPosts, setLikedPosts] = useState<PostId[]>([]);
-  const [saved, setSaved] = useState<PostId[]>([]);
-  const [reportedPosts, setReportedPosts] = useState<PostId[]>([]);
-  const [openPostMenu, setOpenPostMenu] = useState<PostId | null>(null);
-  const [reportingPost, setReportingPost] = useState<PostId | null>(null);
-  const [reportReason, setReportReason] = useState("");
-  const [reportSubmitting, setReportSubmitting] = useState(false);
-  const [reportMessage, setReportMessage] = useState("");
-  const [revealedPosts, setRevealedPosts] = useState<PostId[]>([]);
-  const [followedTopics, setFollowedTopics] = useState<string[]>(["تصوير", "أدب", "علوم"]);
-  const t = translatedCopy[locale];
-  const isRtl = locale === "ar" || locale === "ur";
-
-  useEffect(() => {
-    document.documentElement.lang = locale;
-    document.documentElement.dir = isRtl ? "rtl" : "ltr";
-    document.title = `أَثَر · ${t.title}`;
-  }, [isRtl, locale, t.title]);
+    const [languageOpen, setLanguageOpen] = useState(false);
+    const [activeNav, setActiveNav] = useState<NavKey>("home");
+    const [activeTab, setActiveTab] = useState<"all" | "circles" | "topics" | "saved">("all");
+    const [activeTopic, setActiveTopic] = useState("الكل");
+    const [composerScope, setComposerScope] = useState<"circle" | "topic">("circle");
+    const [composerTopic, setComposerTopic] = useState(topics[0]);
+    const [selectedCircleId, setSelectedCircleId] = useState("");
+    const [draft, setDraft] = useState("");
+    const [mediaFile, setMediaFile] = useState<File | null>(null);
+    const [mediaError, setMediaError] = useState<string | null>(null);
+    const [remotePosts, setRemotePosts] = useState<FeedPost[]>([]);
+    const [localPosts, setLocalPosts] = useState<FeedPost[]>([]);
+    const [userCircles, setUserCircles] = useState<UserCircle[]>([]);
+    const [publishError, setPublishError] = useState(false);
+    const [backendError, setBackendError] = useState("");
+    const [feedError, setFeedError] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [posted, setPosted] = useState(false);
+    const [likedPosts, setLikedPosts] = useState<PostId[]>([]);
+    const [saved, setSaved] = useState<PostId[]>([]);
+    const [reportedPosts, setReportedPosts] = useState<PostId[]>([]);
+    const [openPostMenu, setOpenPostMenu] = useState<PostId | null>(null);
+    const [reportingPost, setReportingPost] = useState<PostId | null>(null);
+    const [reportReason, setReportReason] = useState("");
+    const [reportSubmitting, setReportSubmitting] = useState(false);
+    const [reportMessage, setReportMessage] = useState("");
+    const [revealedPosts, setRevealedPosts] = useState<PostId[]>([]);
+    const [followedTopics, setFollowedTopics] = useState<string[]>(["تصوير", "أدب", "علوم"]);
+    const t = translatedCopy[locale];
+    const isRtl = locale === "ar" || locale === "ur";
+    
+      // File validation function
+      const validateMediaFile = (file: File): string | null => {
+        // Check file type
+        const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+        const validVideoTypes = ["video/mp4", "video/quicktime", "video/webm"];
+        const validTypes = [...validImageTypes, ...validVideoTypes];
+        
+        if (!validTypes.includes(file.type)) {
+          return locale === "ar"
+            ? "نوع الملف غير مدعوم. يُسمح بالصور (JPEG, PNG, GIF, WebP) والفيديو (MP4, MOV, WebM)."
+            : "File type not supported. Images (JPEG, PNG, GIF, WebP) and videos (MP4, MOV, WebM) are allowed.";
+        }
+        
+        // Check file size (50MB for videos, 10MB for images)
+        const maxSize = file.type.startsWith("video/") ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+          const maxMB = file.type.startsWith("video/") ? 50 : 10;
+          const sizeError = locale === "ar"
+            ? `حجم الملف كبير جدًا. الحد الأقصى هو ${maxMB} ميجابايت.`
+            : `File size too large. Maximum is ${maxMB} MB.`;
+          return sizeError;
+        }
+        
+        return null;
+      };
+    
+      useEffect(() => {
+        document.documentElement.lang = locale;
+        document.documentElement.dir = isRtl ? "rtl" : "ltr";
+        document.title = `أَثَر · ${t.title}`;
+      }, [isRtl, locale, t.title]);
 
   useEffect(() => {
     if (!session?.user.id) return;
@@ -1524,6 +1556,11 @@ const Index = () => {
       if (composerScope === "circle" && !selectedCircleId) {
         console.log("EARLY RETURN: NO CIRCLE");
         setBackendError(t.noCircle);
+        return;
+      }
+      if (mediaError) {
+        console.log("EARLY RETURN: MEDIA ERROR");
+        setBackendError(mediaError);
         return;
       }
   
@@ -1695,6 +1732,48 @@ const Index = () => {
                   <Avatar className="h-10 w-10 shrink-0"><AvatarFallback className="bg-[#eadfd4] font-semibold text-[#886d53]">ل</AvatarFallback></Avatar>
                   <div className="min-w-0 flex-1">
                     <textarea value={draft} onChange={(event) => { setDraft(event.target.value); setPublishError(false); }} placeholder={t.writePlaceholder} className="min-h-[62px] w-full resize-none border-0 bg-transparent pt-1 text-sm leading-6 text-[#3d4b43] outline-none placeholder:text-[#a4ada6]" />
+                    
+                                        {/* Media Preview */}
+                                        {mediaFile && (
+                                          <div className="mt-3 relative rounded-xl border border-[#dce5d9] bg-[#f8faf5] p-3">
+                                            <div className="flex items-center gap-3">
+                                              {mediaFile.type.startsWith("image/") ? (
+                                                <img
+                                                  src={URL.createObjectURL(mediaFile)}
+                                                  alt="Preview"
+                                                  className="h-20 w-20 rounded-lg object-cover"
+                                                />
+                                              ) : (
+                                                <video
+                                                  src={URL.createObjectURL(mediaFile)}
+                                                  className="h-20 w-20 rounded-lg object-cover"
+                                                  muted
+                                                />
+                                              )}
+                                              <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-[#3d4b43] truncate">{mediaFile.name}</p>
+                                                <p className="text-xs text-[#8b978e]">
+                                                  {(mediaFile.size / 1024 / 1024).toFixed(2)} MB · {mediaFile.type}
+                                                </p>
+                                              </div>
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setMediaFile(null);
+                                                  setMediaError(null);
+                                                  if (mediaInputRef.current) mediaInputRef.current.value = "";
+                                                }}
+                                                className="shrink-0 rounded-lg p-1.5 text-[#8b978e] hover:bg-[#edf0e8] hover:text-[#a65e52]"
+                                                aria-label={locale === "ar" ? "إزالة الملف" : "Remove file"}
+                                              >
+                                                <X className="h-5 w-5" />
+                                              </button>
+                                            </div>
+                                            {mediaError && (
+                                              <p className="mt-2 text-xs text-[#a65e52]">{mediaError}</p>
+                                            )}
+                                          </div>
+                                        )}
                     <div className="mb-3 flex flex-wrap items-center gap-2">
                       <button onClick={() => { setComposerScope("circle"); setPublishError(false); }} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${composerScope === "circle" ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-[#f1f4ee]"}`}>{t.privateCircle}</button>
                       <button onClick={() => { setComposerScope("topic"); setPublishError(false); }} className={`rounded-xl px-3 py-2 text-xs font-semibold transition ${composerScope === "topic" ? "bg-[#e3ecdf] text-[#4e6a48]" : "text-[#8b978e] hover:bg-[#f1f4ee]"}`}>{t.publicTopic}</button>
@@ -1706,7 +1785,28 @@ const Index = () => {
                     {publishError && <div className="mb-3 rounded-xl bg-[#f8e9e5] px-3 py-2 text-xs font-semibold leading-5 text-[#a65e52]">{t.qualityError}</div>}
                     {backendError && <div className="mb-3 rounded-xl bg-[#f8e9e5] px-3 py-2 text-xs font-semibold leading-5 text-[#a65e52]">{backendError}</div>}
                     <div className="flex items-center justify-between border-t border-[#edf0ea] pt-3">
-                      <div className="flex min-w-0 items-center gap-2 text-xs text-[#93a096]"><label className="shrink-0 cursor-pointer rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]" title={t.uploadMedia}><Plus className="h-4 w-4" /><input ref={mediaInputRef} type="file" accept="image/*,video/*" className="sr-only" onChange={(event) => setMediaFile(event.target.files?.[0] ?? null)} /></label><span className="truncate">{mediaFile ? `${t.mediaSelected}: ${mediaFile.name}` : composerScope === "circle" ? t.privateCircle : `${t.publicTopic} · ${composerTopic}`}</span></div>
+                      <div className="flex min-w-0 items-center gap-2 text-xs text-[#93a096]">
+                        <label className="shrink-0 cursor-pointer rounded-lg p-1.5 hover:bg-[#edf3e9] hover:text-[#6b7f5a]" title={t.uploadMedia}>
+                          <Plus className="h-4 w-4" />
+                          <input ref={mediaInputRef} type="file" accept="image/*,video/*" className="sr-only" onChange={(event) => {
+                            const file = event.target.files?.[0] ?? null;
+                            if (file) {
+                              const error = validateMediaFile(file);
+                              if (error) {
+                                setMediaError(error);
+                                setMediaFile(null);
+                              } else {
+                                setMediaFile(file);
+                                setMediaError(null);
+                              }
+                            } else {
+                              setMediaFile(null);
+                              setMediaError(null);
+                            }
+                          }} />
+                        </label>
+                        <span className="truncate">{mediaFile ? t.mediaSelected : composerScope === "circle" ? t.privateCircle : `${t.publicTopic} · ${composerTopic}`}</span>
+                      </div>
                       <Button onClick={publish} disabled={saving} size="sm" className="rounded-xl bg-[#6b7f5a] px-4 text-xs font-semibold text-white shadow-[0_5px_12px_rgba(107,127,90,0.18)] hover:bg-[#587047]">{saving ? "…" : t.publish}<Send className="h-3.5 w-3.5" /></Button>
                     </div>
                   </div>
